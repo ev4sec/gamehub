@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/*
+ * Tailwind 4 is configured from CSS rather than from a JS config file. One
+ * import replaces the three directives, and the content sources it scans are
+ * detected automatically, which is why `tailwind.config.js` is gone.
+ */
+@import 'tailwindcss';
 
 @layer base {
   html,

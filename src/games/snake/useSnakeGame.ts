@@ -44,7 +44,12 @@ export function useSnakeGame(
   const saveRef = useRef(save);
   const recordedRef = useRef(false);
 
-  saveRef.current = save;
+  // Refreshed in an effect rather than assigned during render: everything that
+  // reads it runs after commit, and writing to a ref mid-render is not safe
+  // under concurrent rendering.
+  useEffect(() => {
+    saveRef.current = save;
+  }, [save]);
 
   useEffect(() => {
     sfx.enabled = save.sound;
@@ -83,9 +88,9 @@ export function useSnakeGame(
 
   // Owns the run: builds state, sizes the canvas, drives the fixed-timestep loop.
   useEffect(() => {
+    // The HUD is cleared by `quit`, so this branch only drops the state.
     if (!mode) {
       stateRef.current = null;
-      setHud(null);
       return;
     }
     const canvas = canvasRef.current;
@@ -197,6 +202,9 @@ export function useSnakeGame(
   const quit = useCallback(() => {
     sfx.ui();
     setMode(null);
+    // Cleared here rather than in the run effect, so leaving a game is one
+    // state change instead of a render followed by a corrective one.
+    setHud(null);
   }, []);
 
   const setSkin = useCallback((id: string) => {

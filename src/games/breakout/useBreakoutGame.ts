@@ -30,7 +30,9 @@ function hudSignature(hud: Hud): string {
   ].join('|');
 }
 
-export function useBreakoutGame(canvasRef: RefObject<HTMLCanvasElement>) {
+// React 19 types `useRef<T>(null)` as `RefObject<T | null>`; the effect already
+// guards for the null, so the signature widens to match.
+export function useBreakoutGame(canvasRef: RefObject<HTMLCanvasElement | null>) {
   const [mode, setMode] = useState<Mode | null>(null);
   const [hud, setHud] = useState<Hud | null>(null);
   const [save, setSave] = useState<SaveData>(() => loadSave());
@@ -42,7 +44,12 @@ export function useBreakoutGame(canvasRef: RefObject<HTMLCanvasElement>) {
   const recordedRef = useRef(false);
   const bricksRef = useRef(0);
   const saveRef = useRef(save);
-  saveRef.current = save;
+  // Refreshed in an effect rather than assigned during render: everything that
+  // reads it runs after commit, and writing to a ref mid-render is not safe
+  // under concurrent rendering.
+  useEffect(() => {
+    saveRef.current = save;
+  }, [save]);
 
   const [runId, setRunId] = useState(0);
 
@@ -66,10 +73,11 @@ export function useBreakoutGame(canvasRef: RefObject<HTMLCanvasElement>) {
   }, []);
 
   useEffect(() => {
+    // `quit` clears the HUD itself; doing it here too would be a setState in
+    // an effect body for a value that is already correct.
     if (!mode) {
       stateRef.current = null;
       rendererRef.current = null;
-      setHud(null);
       return;
     }
 

@@ -73,15 +73,31 @@ async function main() {
       `canvas[data-preview="${game.id}"]`,
     ) as HTMLCanvasElement | null;
     check(canvas !== null, `${game.title} has a preview`);
-    check(
-      canvas !== null && canvas.width > 0 && canvas.height > 0,
-      `${game.title} preview got a backing size`,
-    );
   }
 
   section('hub: the preview driver');
+  // Polled rather than asserted outright: React flushes passive effects on its
+  // own schedule, and how many turns that takes has changed between major
+  // versions. Waiting for the condition tests the driver; counting settles
+  // tests React's release notes.
+  await until(() => pendingFrames() > 0, 'the preview driver to start');
   check(pendingFrames() > 0, 'the driver schedules frames on the hub');
   await frames(4, 16);
+
+  // Checked after a frame, and against the exact figure, because an unsized
+  // canvas is not zero in jsdom: the HTML default is 300x150, so `width > 0`
+  // would pass with no driver running at all. A zero bounding rect floors at
+  // MIN_CSS 160 and doubles for the stubbed device pixel ratio.
+  for (const game of games) {
+    if (!previews[game.id]) continue;
+    const canvas = document.querySelector(
+      `canvas[data-preview="${game.id}"]`,
+    ) as HTMLCanvasElement | null;
+    check(
+      canvas !== null && canvas.width === 320,
+      `${game.title} preview was sized by the driver, not left at the default`,
+    );
+  }
   const advanced = previewFrames();
   for (const game of games) {
     if (!previews[game.id]) continue;
@@ -126,6 +142,9 @@ async function main() {
       document.querySelector('canvas[data-preview]') === null,
       'preview canvases unmount with the hub',
     );
+    // Polled for the same reason as the start: effect cleanup runs on React's
+    // schedule, not on ours.
+    await until(() => pendingFrames() === 0, 'the preview driver to stop');
     check(pendingFrames() === 0, 'the preview driver stops when the hub leaves');
 
     await backToHub();

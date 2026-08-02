@@ -39,7 +39,10 @@ function hudSignature(hud: Hud): string {
   ].join('|');
 }
 
-export function useTetrisGame(canvasRef: RefObject<HTMLCanvasElement>) {
+// React 19 types `useRef<T>(null)` as `RefObject<T | null>`, which is honest:
+// the ref really is null until the canvas mounts. The effect already guards for
+// it, so the signature widens to match rather than the callers casting.
+export function useTetrisGame(canvasRef: RefObject<HTMLCanvasElement | null>) {
   const [mode, setMode] = useState<Mode | null>(null);
   const [hud, setHud] = useState<Hud | null>(null);
   const [save, setSave] = useState<SaveData>(() => loadSave());
@@ -49,7 +52,13 @@ export function useTetrisGame(canvasRef: RefObject<HTMLCanvasElement>) {
   const signatureRef = useRef('');
   const recordedRef = useRef(false);
   const saveRef = useRef(save);
-  saveRef.current = save;
+  // Refreshed in an effect rather than assigned during render. Everything that
+  // reads it (the loop's tick, the event handlers) runs after commit, so it is
+  // always the latest value by the time anything asks, and writing to a ref
+  // mid-render is not safe under concurrent rendering.
+  useEffect(() => {
+    saveRef.current = save;
+  }, [save]);
 
   /** Bumped to force the run effect to build a fresh game on restart. */
   const [runId, setRunId] = useState(0);
@@ -75,9 +84,11 @@ export function useTetrisGame(canvasRef: RefObject<HTMLCanvasElement>) {
   }, []);
 
   useEffect(() => {
+    // `quit` clears the HUD itself, so this branch only has to drop the state.
+    // Clearing it here as well would be a setState in an effect body, which
+    // costs an extra render pass for a value that is already correct.
     if (!mode) {
       stateRef.current = null;
-      setHud(null);
       return;
     }
 

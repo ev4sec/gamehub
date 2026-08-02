@@ -31,7 +31,12 @@ export function use2048Game() {
   const stateRef = useRef<GameState | null>(null);
   const recordedRef = useRef(false);
   const saveRef = useRef(save);
-  saveRef.current = save;
+  // Refreshed in an effect rather than assigned during render: everything that
+  // reads it runs after commit, and writing to a ref mid-render is not safe
+  // under concurrent rendering.
+  useEffect(() => {
+    saveRef.current = save;
+  }, [save]);
 
   useEffect(() => {
     audio.enabled = save.sound;

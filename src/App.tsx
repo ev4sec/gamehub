@@ -16,22 +16,18 @@ import { Hub } from './shell/Hub';
 export default function App() {
   const [selected, setSelected] = useState<string | null>(null);
   const [Game, setGame] = useState<ComponentType<GameProps> | null>(null);
-  const [failed, setFailed] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  // Derived rather than stored. An id with no registry entry is knowable during
+  // render, so making it state would mean setting it from inside the effect and
+  // paying an extra render to reach a conclusion already available here.
+  const entry = selected ? findGame(selected) : undefined;
+  const failed = loadFailed || (selected !== null && !entry);
 
   useEffect(() => {
-    if (!selected) {
-      setGame(null);
-      setFailed(false);
-      return;
-    }
-    const entry = findGame(selected);
-    if (!entry) {
-      setFailed(true);
-      return;
-    }
+    if (!entry) return;
 
     let live = true;
-    setFailed(false);
     entry
       .load()
       .then((component) => {
@@ -40,22 +36,28 @@ export default function App() {
         if (live) setGame(() => component);
       })
       .catch(() => {
-        if (live) setFailed(true);
+        if (live) setLoadFailed(true);
       });
 
     return () => {
       live = false;
     };
-  }, [selected]);
+  }, [entry]);
 
+  // Both of these clear the previous game in the same handler that changes the
+  // selection, so the effect never has to correct state after the fact.
   const select = useCallback((id: string) => {
     audio.unlock();
     audio.ui();
+    setGame(null);
+    setLoadFailed(false);
     setSelected(id);
   }, []);
 
   const exit = useCallback(() => {
     audio.ui();
+    setGame(null);
+    setLoadFailed(false);
     setSelected(null);
   }, []);
 
