@@ -1,5 +1,6 @@
 import { snakeDeepChecks } from './snake-ui';
 import { tetrisDeepChecks } from './tetris-ui';
+import { game2048DeepChecks } from './2048-ui';
 
 /**
  * Per-game deep UI checks, keyed by registry id.
@@ -12,4 +13,5 @@ import { tetrisDeepChecks } from './tetris-ui';
 export const deepChecks: Record<string, () => Promise<void>> = {
   snake: snakeDeepChecks,
   tetris: tetrisDeepChecks,
+  '2048': game2048DeepChecks,
 };

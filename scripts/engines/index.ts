@@ -1,5 +1,6 @@
 import { snakeEngineChecks } from './snake';
 import { tetrisEngineChecks } from './tetris';
+import { twentyFortyEightEngineChecks } from './2048';
 
 /**
  * Per-game engine checks, keyed by registry id.
@@ -12,4 +13,5 @@ import { tetrisEngineChecks } from './tetris';
 export const engineChecks: Record<string, () => void> = {
   snake: snakeEngineChecks,
   tetris: tetrisEngineChecks,
+  '2048': twentyFortyEightEngineChecks,
 };

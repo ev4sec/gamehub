@@ -41,6 +41,13 @@ export const games: GameEntry[] = [
       'Seven-bag pieces, wall kicks, hold and ghost. Marathon, a forty-line sprint, or two minutes of Ultra.',
     load: () => import('../games/tetris').then((m) => m.default),
   },
+  {
+    id: '2048',
+    title: '2048',
+    blurb:
+      'Slide, merge, and try to keep the big tile cornered. Three board sizes, and an undo for the move you regret.',
+    load: () => import('../games/2048').then((m) => m.default),
+  },
 ];
 
 export function findGame(id: string): GameEntry | undefined {

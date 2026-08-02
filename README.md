@@ -12,10 +12,11 @@ npm run build    # static bundle in dist/
 
 ## Status
 
-Two games in. Snake, with four modes, five power-ups, portals, encroaching
+Three games in. Snake, with four modes, five power-ups, portals, encroaching
 hazards, unlockable skins and a rival snake that hunts the same apples you do.
 Tetris, with seven-bag randomisation, SRS rotation and wall kicks, hold, ghost
-piece, T-spin scoring and back-to-back chains, across three modes.
+piece, T-spin scoring and back-to-back chains, across three modes. 2048, on
+three board sizes, with one move of undo.
 
 ## Games
 
@@ -23,16 +24,23 @@ piece, T-spin scoring and back-to-back chains, across three modes.
 | --- | --- |
 | **Snake** | Continuous steering under a clock |
 | **Tetris** | Falling-block placement, ticked, with sustained-input auto-repeat |
+| **2048** | Turn-based. No clock, no loop, no canvas |
 
-Planned, in the order they go in: 2048 (turn-based, no clock at all), Breakout
-(analog paddle, float physics rather than a grid), Sokoban (turn-based puzzle
-over authored levels).
+Planned, in the order they go in: Breakout (analog paddle, float physics rather
+than a grid), Sokoban (turn-based puzzle over authored levels).
 
 The spread is chosen so the games feel different to play, and so the shared
 platform is proven against a continuous game, a grid game and a game with no
-loop at all rather than five variations on one shape. 2048 goes in third
-deliberately: it is the one most likely to prove the platform wrong, and that is
-worth learning while there is still appetite to change it.
+loop at all rather than five variations on one shape.
+
+2048 went in third deliberately, as the one most likely to prove the platform
+wrong. It did not. It imports neither `platform/loop` nor a canvas: the whole
+game is request-response, state changes only when the player does something,
+and the board is DOM with CSS transitions. That is the outcome the contract was
+shaped for, and its UI smoke asserts the absence of a canvas so the property
+cannot quietly rot. The one thing it did change was `platform/rng`, which was
+lifted out of a game and into the platform once a second game wanted seeded
+randomness.
 
 ## How it is meant to fit together
 
@@ -48,6 +56,7 @@ src/
   games/
     snake/    Engine, renderer, skins, UI. Self-contained.
     tetris/   Engine, renderer, UI. Self-contained.
+    2048/     Engine and UI. No renderer, because there is no canvas.
 scripts/      Headless smoke harnesses
   engines/    Per-game engine checks, keyed by registry id
   games/      Per-game deep UI flows, keyed by registry id
