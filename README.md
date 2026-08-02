@@ -12,11 +12,12 @@ npm run build    # static bundle in dist/
 
 ## Status
 
-Three games in. Snake, with four modes, five power-ups, portals, encroaching
+Four games in. Snake, with four modes, five power-ups, portals, encroaching
 hazards, unlockable skins and a rival snake that hunts the same apples you do.
 Tetris, with seven-bag randomisation, SRS rotation and wall kicks, hold, ghost
 piece, T-spin scoring and back-to-back chains, across three modes. 2048, on
-three board sizes, with one move of undo.
+three board sizes, with one move of undo. Breakout, with five authored walls,
+an endless generator, five power-ups and a paddle that aims.
 
 ## Games
 
@@ -25,9 +26,9 @@ three board sizes, with one move of undo.
 | **Snake** | Continuous steering under a clock |
 | **Tetris** | Falling-block placement, ticked, with sustained-input auto-repeat |
 | **2048** | Turn-based. No clock, no loop, no canvas |
+| **Breakout** | Continuous float physics, analog paddle, no grid at all |
 
-Planned, in the order they go in: Breakout (analog paddle, float physics rather
-than a grid), Sokoban (turn-based puzzle over authored levels).
+Planned: Sokoban (turn-based puzzle over authored levels).
 
 The spread is chosen so the games feel different to play, and so the shared
 platform is proven against a continuous game, a grid game and a game with no
@@ -57,6 +58,7 @@ src/
     snake/    Engine, renderer, skins, UI. Self-contained.
     tetris/   Engine, renderer, UI. Self-contained.
     2048/     Engine and UI. No renderer, because there is no canvas.
+    breakout/ Engine, renderer, UI. Self-contained.
 scripts/      Headless smoke harnesses
   engines/    Per-game engine checks, keyed by registry id
   games/      Per-game deep UI flows, keyed by registry id

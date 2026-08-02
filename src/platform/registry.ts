@@ -48,6 +48,13 @@ export const games: GameEntry[] = [
       'Slide, merge, and try to keep the big tile cornered. Three board sizes, and an undo for the move you regret.',
     load: () => import('../games/2048').then((m) => m.default),
   },
+  {
+    id: 'breakout',
+    title: 'Breakout',
+    blurb:
+      'A paddle that aims rather than blocks, power-ups that drop, and five walls to bring down. Or an endless one.',
+    load: () => import('../games/breakout').then((m) => m.default),
+  },
 ];
 
 export function findGame(id: string): GameEntry | undefined {
