@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b",
-    "smoke": "esbuild scripts/smoke.ts --bundle --platform=node --format=cjs --outfile=scripts/.smoke.cjs --log-level=warning && node scripts/.smoke.cjs",
+    "smoke": "esbuild scripts/smoke.ts --bundle --platform=node --format=cjs --jsx=automatic --outfile=scripts/.smoke.cjs --log-level=warning && node scripts/.smoke.cjs",
     "smoke:ui": "esbuild scripts/ui-smoke.ts --bundle --platform=node --format=cjs --jsx=automatic --external:jsdom --outfile=scripts/.ui-smoke.cjs --log-level=warning && node scripts/.ui-smoke.cjs",
     "check": "npm run typecheck && npm run lint && npm run smoke && npm run smoke:ui",
     "preview": "vite preview"

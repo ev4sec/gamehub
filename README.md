@@ -12,18 +12,21 @@ npm run build    # static bundle in dist/
 
 ## Status
 
-One game in: Snake, with four modes, five power-ups, portals, encroaching
+Two games in. Snake, with four modes, five power-ups, portals, encroaching
 hazards, unlockable skins and a rival snake that hunts the same apples you do.
+Tetris, with seven-bag randomisation, SRS rotation and wall kicks, hold, ghost
+piece, T-spin scoring and back-to-back chains, across three modes.
 
 ## Games
 
 | Game | Interaction model |
 | --- | --- |
 | **Snake** | Continuous steering under a clock |
+| **Tetris** | Falling-block placement, ticked, with sustained-input auto-repeat |
 
-Planned, in the order they go in: Tetris (falling-block placement, ticked),
-2048 (turn-based, no clock at all), Breakout (analog paddle, float physics
-rather than a grid), Sokoban (turn-based puzzle over authored levels).
+Planned, in the order they go in: 2048 (turn-based, no clock at all), Breakout
+(analog paddle, float physics rather than a grid), Sokoban (turn-based puzzle
+over authored levels).
 
 The spread is chosen so the games feel different to play, and so the shared
 platform is proven against a continuous game, a grid game and a game with no
@@ -40,10 +43,14 @@ src/
               loop.ts     Fixed-timestep driver, for games that want a clock
               save.ts     localStorage, namespaced per game
               audio.ts    WebAudio synthesis primitive
+              rng.ts      Seeded random, so a soak can be replayed
   shell/      The hub page and the chrome around a running game
   games/
     snake/    Engine, renderer, skins, UI. Self-contained.
+    tetris/   Engine, renderer, UI. Self-contained.
 scripts/      Headless smoke harnesses
+  engines/    Per-game engine checks, keyed by registry id
+  games/      Per-game deep UI flows, keyed by registry id
 ```
 
 A game is asked for very little: an id, a title, a blurb, and a component that
@@ -74,6 +81,17 @@ npm run smoke:ui   # the whole app in a headless DOM, driven like a player
 
 Both bundle through esbuild, already a Vite dependency, so they run offline with
 no extra toolchain.
+
+Both are driven by the registry rather than by a list kept in the test, and both
+name any registered game that has no checks instead of passing quietly. A suite
+that silently shrinks as the hub grows is worse than no suite.
+
+`smoke` pairs a random-input soak with a soak driven by a competent player. The
+random one is what catches illegal states; the competent one is what makes the
+code past a placement run at all. Random tetris input tops out in a few hundred
+ticks and never completes a row, so without the second soak the entire scoring,
+combo and level-up path would go unexecuted while the suite still reported
+green.
 
 `smoke:ui` has two layers. The generic pass is driven by the registry: every
 registered game must appear on the hub, mount when its card is clicked, and be

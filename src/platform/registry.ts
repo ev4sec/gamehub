@@ -34,6 +34,13 @@ export const games: GameEntry[] = [
       'Four modes, power-ups, portals, encroaching hazards and a rival snake that hunts the same apples you do.',
     load: () => import('../games/snake').then((m) => m.default),
   },
+  {
+    id: 'tetris',
+    title: 'Tetris',
+    blurb:
+      'Seven-bag pieces, wall kicks, hold and ghost. Marathon, a forty-line sprint, or two minutes of Ultra.',
+    load: () => import('../games/tetris').then((m) => m.default),
+  },
 ];
 
 export function findGame(id: string): GameEntry | undefined {

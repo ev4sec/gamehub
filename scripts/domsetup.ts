@@ -117,3 +117,20 @@ export function press(key: string, code?: string): void {
     new w.KeyboardEvent('keydown', { key, code: code ?? key, bubbles: true, cancelable: true }),
   );
 }
+
+/**
+ * The matching key release. Games with sustained input (anything with auto
+ * repeat) latch a direction on keydown and only drop it here, so a test that
+ * only ever presses leaves the piece travelling for the rest of the run.
+ */
+export function release(key: string, code?: string): void {
+  w.dispatchEvent(
+    new w.KeyboardEvent('keyup', { key, code: code ?? key, bubbles: true, cancelable: true }),
+  );
+}
+
+/** A press and its release, for input that is not meant to be held. */
+export function tap(key: string, code?: string): void {
+  press(key, code);
+  release(key, code);
+}

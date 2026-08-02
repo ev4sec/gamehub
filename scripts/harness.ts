@@ -1,23 +1,6 @@
 import { settle } from './domsetup';
 
-let failures = 0;
-
-export function check(cond: boolean, msg: string): void {
-  if (cond) {
-    console.log(`  ok   ${msg}`);
-  } else {
-    failures++;
-    console.log(`  FAIL ${msg}`);
-  }
-}
-
-export function section(name: string): void {
-  console.log(`\n${name}`);
-}
-
-export function failureCount(): number {
-  return failures;
-}
+export { check, expect, failureCount, section } from './checks';
 
 /**
  * Waits for a condition, settling between attempts.
