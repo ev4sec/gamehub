@@ -1,43 +1,87 @@
-import { games } from './platform/registry';
+import { useCallback, useEffect, useState, type ComponentType } from 'react';
+import { audio } from './platform/audio';
+import { findGame } from './platform/registry';
+import type { GameProps } from './platform/game';
+import { Hub } from './shell/Hub';
 
+/**
+ * Routes between the hub and one loaded game.
+ *
+ * The loaded component is held in state rather than behind Suspense so the
+ * three render branches below are plainly exclusive and readable in one screen.
+ * That is deliberate. The bug this project inherited was a render gate whose two
+ * conditions each waited on the other, and it survived a fully tested engine
+ * precisely because nothing ever executed the gate.
+ */
 export default function App() {
-  return (
-    <div className="h-full overflow-y-auto">
-      <main className="mx-auto flex min-h-full max-w-4xl flex-col px-6 py-12">
-        <header className="mb-10">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-100">
-            Game Hub
-          </h1>
-          <p className="mt-2 text-slate-400">
-            A small collection of browser games sharing one loop, one save layer
-            and one test harness.
-          </p>
-        </header>
+  const [selected, setSelected] = useState<string | null>(null);
+  const [Game, setGame] = useState<ComponentType<GameProps> | null>(null);
+  const [failed, setFailed] = useState(false);
 
-        {games.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-slate-700 px-5 py-8 text-center text-slate-500">
-            No games registered yet.
-          </p>
-        ) : (
-          <ul className="grid gap-4 sm:grid-cols-2">
-            {games.map((game) => (
-              <li key={game.id}>
-                <button
-                  type="button"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-5 py-4 text-left transition hover:border-slate-500 hover:bg-slate-800/60"
-                >
-                  <span className="block font-medium text-slate-100">
-                    {game.title}
-                  </span>
-                  <span className="mt-1 block text-sm text-slate-400">
-                    {game.blurb}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+  useEffect(() => {
+    if (!selected) {
+      setGame(null);
+      setFailed(false);
+      return;
+    }
+    const entry = findGame(selected);
+    if (!entry) {
+      setFailed(true);
+      return;
+    }
+
+    let live = true;
+    setFailed(false);
+    entry
+      .load()
+      .then((component) => {
+        // React treats a bare function in state as a lazy initialiser, so the
+        // component has to be wrapped or it gets called instead of stored.
+        if (live) setGame(() => component);
+      })
+      .catch(() => {
+        if (live) setFailed(true);
+      });
+
+    return () => {
+      live = false;
+    };
+  }, [selected]);
+
+  const select = useCallback((id: string) => {
+    audio.unlock();
+    audio.ui();
+    setSelected(id);
+  }, []);
+
+  const exit = useCallback(() => {
+    audio.ui();
+    setSelected(null);
+  }, []);
+
+  if (!selected) return <Hub onSelect={select} />;
+
+  if (failed) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-950 px-6 text-center text-slate-300">
+        <p>That game failed to load.</p>
+        <button
+          onClick={exit}
+          className="rounded-lg border border-slate-700 px-4 py-2 transition hover:border-slate-500"
+        >
+          Back to all games
+        </button>
       </main>
-    </div>
-  );
+    );
+  }
+
+  if (!Game) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-500">
+        Loading...
+      </main>
+    );
+  }
+
+  return <Game onExit={exit} />;
 }
