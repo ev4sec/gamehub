@@ -34,6 +34,62 @@ w.ResizeObserver = class {
   disconnect() {}
 };
 
+/**
+ * jsdom reports `visibilityState: 'prerender'` and `hidden: true` under
+ * `pretendToBeVisual: false`. Anything that skips work while the page is hidden
+ * would therefore never run a single frame here, and every assertion about it
+ * would pass while testing nothing. Overridden to a visible page.
+ */
+Object.defineProperty(w.document, 'visibilityState', {
+  value: 'visible',
+  configurable: true,
+});
+Object.defineProperty(w.document, 'hidden', { value: false, configurable: true });
+
+// jsdom has no matchMedia at all, and calling it throws rather than returning
+// undefined. `matches` is a getter so a flip is seen by a query object that was
+// captured earlier, which is how the real thing behaves.
+let reducedMotion = false;
+const motionListeners = new Set<(event: { matches: boolean }) => void>();
+
+w.matchMedia = (query: string) => ({
+  media: query,
+  get matches() {
+    return query.includes('prefers-reduced-motion') ? reducedMotion : false;
+  },
+  onchange: null,
+  addEventListener: (_type: string, cb: (event: { matches: boolean }) => void) => {
+    motionListeners.add(cb);
+  },
+  removeEventListener: (_type: string, cb: (event: { matches: boolean }) => void) => {
+    motionListeners.delete(cb);
+  },
+  addListener: () => {},
+  removeListener: () => {},
+  dispatchEvent: () => false,
+});
+
+/** Flips the reduced-motion preference and notifies anything listening. */
+export function setReducedMotion(on: boolean): void {
+  reducedMotion = on;
+  for (const cb of [...motionListeners]) cb({ matches: on });
+}
+
+// jsdom has no IntersectionObserver either. This one reports every observed
+// element as visible immediately, so "off-screen" is never the reason a test
+// sees nothing painted.
+w.IntersectionObserver = class {
+  private readonly cb: (records: unknown[], observer: unknown) => void;
+  constructor(cb: (records: unknown[], observer: unknown) => void) {
+    this.cb = cb;
+  }
+  observe(el: unknown) {
+    this.cb([{ target: el, isIntersecting: true, intersectionRatio: 1 }], this);
+  }
+  unobserve() {}
+  disconnect() {}
+};
+
 Object.defineProperty(w, 'devicePixelRatio', { value: 2, configurable: true });
 
 // Hand-cranked animation frames, so the loop advances exactly when we say.
@@ -55,6 +111,7 @@ const globals = [
   'Element', 'Node', 'MouseEvent', 'KeyboardEvent', 'Event', 'PointerEvent',
   'requestAnimationFrame', 'cancelAnimationFrame', 'ResizeObserver',
   'devicePixelRatio', 'localStorage', 'getComputedStyle',
+  'matchMedia', 'IntersectionObserver',
 ];
 for (const key of globals) {
   (globalThis as any)[key] = w[key];
@@ -63,6 +120,18 @@ for (const key of globals) {
 // Deliberately not assigned onto the jsdom window: `performance` is a live
 // accessor there and overwriting it sends jsdom's own impl into recursion.
 (globalThis as any).performance = { now: () => clock };
+
+/**
+ * How many animation frames are currently scheduled.
+ *
+ * The hub's preview driver is the only thing that schedules a frame while no
+ * game is mounted, so this is how the suite asserts that it started, that it
+ * stops under reduced motion, and above all that it does not leak a loop behind
+ * a game that has been opened.
+ */
+export function pendingFrames(): number {
+  return pending.size;
+}
 
 /** Runs `count` animation frames, each advancing the clock by `dt` ms. */
 export async function frames(count: number, dt = 16): Promise<void> {

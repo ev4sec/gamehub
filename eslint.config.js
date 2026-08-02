@@ -26,6 +26,28 @@ export default tseslint.config(
       ],
     },
   },
+  // The shell renders the hub, which must not carry any game's code: every
+  // game is reached through the registry's dynamic import and builds to its own
+  // chunk. The hub's preview art therefore duplicates a few colours rather than
+  // importing the games it depicts, and this rule is what keeps that honest
+  // when the duplication later looks like something worth "tidying up".
+  {
+    files: ['src/shell/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/games/*', '**/games/**'],
+              message:
+                'The shell must not import game code. Games are reached only through registry load(), so that each one stays in its own lazily loaded chunk.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   // The check scripts run in Node, not the browser.
   {
     files: ['scripts/**/*.ts'],

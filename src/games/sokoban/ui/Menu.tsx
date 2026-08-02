@@ -17,7 +17,7 @@ export function Menu({ save, onStart, onToggleSound, onExit }: Props) {
     <div className="w-full max-w-2xl px-6 py-10">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-5xl font-black tracking-tight text-emerald-300">SOKOBAN</h1>
+          <h1 className="text-5xl font-black tracking-tight text-violet-300">SOKOBAN</h1>
           <p className="mt-2 text-sm text-slate-400">
             {solved > 0
               ? `${solved} of ${LEVELS.length} levels solved.`
@@ -40,14 +40,14 @@ export function Menu({ save, onStart, onToggleSound, onExit }: Props) {
             <li key={level.name}>
               <button
                 onClick={() => onStart(index)}
-                className="w-full rounded-2xl border border-slate-700/70 bg-slate-800/40 p-4 text-left transition hover:border-emerald-400/70 hover:bg-slate-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                className="w-full rounded-2xl border border-slate-700/70 bg-slate-800/40 p-4 text-left transition hover:border-violet-400/70 hover:bg-slate-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
               >
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="text-base font-bold text-slate-100">
                     {index + 1}. {level.name}
                   </span>
                   {best && (
-                    <span className="flex items-center gap-1 text-xs text-emerald-300">
+                    <span className="flex items-center gap-1 text-xs text-violet-300">
                       <Check size={12} />
                       {best.moves}
                     </span>
