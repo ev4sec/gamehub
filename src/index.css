@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    background-color: #020617;
+    color: #e2e8f0;
+    font-family:
+      ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    /* Stops the page rubber-banding while you swipe to steer. */
+    overscroll-behavior: none;
+  }
+
+  /* Arrow keys and space are game input, never scrolling. */
+  #root {
+    overflow: hidden;
+  }
+}
