@@ -1,0 +1,57 @@
+name: Deploy
+
+# Builds the static bundle and publishes it to GitHub Pages.
+#
+# The checks run before the build on purpose. There is no server and no way to
+# roll back a bad page beyond pushing another commit, so a typecheck failure or
+# a red smoke suite should stop the deploy rather than reach the site.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. A queued run is superseded rather than racing the one
+# already publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      # typecheck, lint, engine invariants, and the whole app in a headless DOM
+      - run: npm run check
+
+      - run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
