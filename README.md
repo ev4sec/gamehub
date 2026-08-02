@@ -12,12 +12,15 @@ npm run build    # static bundle in dist/
 
 ## Status
 
-Four games in. Snake, with four modes, five power-ups, portals, encroaching
-hazards, unlockable skins and a rival snake that hunts the same apples you do.
-Tetris, with seven-bag randomisation, SRS rotation and wall kicks, hold, ghost
-piece, T-spin scoring and back-to-back chains, across three modes. 2048, on
-three board sizes, with one move of undo. Breakout, with five authored walls,
-an endless generator, five power-ups and a paddle that aims.
+Five games in, which is the whole list this project set out to build.
+
+Snake, with four modes, five power-ups, portals, encroaching hazards,
+unlockable skins and a rival snake that hunts the same apples you do. Tetris,
+with seven-bag randomisation, SRS rotation and wall kicks, hold, ghost piece,
+T-spin scoring and back-to-back chains, across three modes. 2048, on three
+board sizes, with one move of undo. Breakout, with five authored walls, an
+endless generator, five power-ups and a paddle that aims. Sokoban, six
+hand-built warehouses with unlimited undo and a deadlock warning.
 
 ## Games
 
@@ -27,8 +30,7 @@ an endless generator, five power-ups and a paddle that aims.
 | **Tetris** | Falling-block placement, ticked, with sustained-input auto-repeat |
 | **2048** | Turn-based. No clock, no loop, no canvas |
 | **Breakout** | Continuous float physics, analog paddle, no grid at all |
-
-Planned: Sokoban (turn-based puzzle over authored levels).
+| **Sokoban** | Turn-based puzzle over authored levels, unlimited undo |
 
 The spread is chosen so the games feel different to play, and so the shared
 platform is proven against a continuous game, a grid game and a game with no
@@ -59,6 +61,7 @@ src/
     tetris/   Engine, renderer, UI. Self-contained.
     2048/     Engine and UI. No renderer, because there is no canvas.
     breakout/ Engine, renderer, UI. Self-contained.
+    sokoban/  Engine, levels, UI. DOM again, no canvas.
 scripts/      Headless smoke harnesses
   engines/    Per-game engine checks, keyed by registry id
   games/      Per-game deep UI flows, keyed by registry id
@@ -102,12 +105,23 @@ random one is what catches illegal states; the competent one is what makes the
 code past a placement run at all. Random tetris input tops out in a few hundred
 ticks and never completes a row, so without the second soak the entire scoring,
 combo and level-up path would go unexecuted while the suite still reported
-green.
+green. The same applies to Breakout, where a paddle that tracks the ball
+perfectly returns it dead centre every time and rallies forever without
+clearing anything.
+
+Where a property can be proved rather than sampled, it is. Sokoban's suite runs
+a breadth-first solver over every authored level, so a level that cannot be
+finished fails the build instead of being found by a player who spends twenty
+minutes proving it by hand. 2048 checks conservation: merging preserves the
+total and so does sliding, so the board's sum can only change by the value of
+the tile that spawned, and almost every way of getting the merge scan wrong
+breaks that equality on the very first move.
 
 `smoke:ui` has two layers. The generic pass is driven by the registry: every
 registered game must appear on the hub, mount when its card is clicked, and be
 leavable. Deeper per-game flows live in `scripts/games/` keyed by registry id;
-snake's plays a full run, pauses it, dies, restarts, and visits every mode. A
+snake's plays a full run, pauses it, dies, restarts, and visits every mode, and
+sokoban's drives the first level from its opening position to solved. A
 game registered without a deep script still gets the generic pass, and the
 harness says so out loud rather than reporting a pass that covered almost
 nothing.

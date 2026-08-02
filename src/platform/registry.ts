@@ -55,6 +55,13 @@ export const games: GameEntry[] = [
       'A paddle that aims rather than blocks, power-ups that drop, and five walls to bring down. Or an endless one.',
     load: () => import('../games/breakout').then((m) => m.default),
   },
+  {
+    id: 'sokoban',
+    title: 'Sokoban',
+    blurb:
+      'Six hand-built warehouses. Push every box onto a marker, and remember that you can never pull.',
+    load: () => import('../games/sokoban').then((m) => m.default),
+  },
 ];
 
 export function findGame(id: string): GameEntry | undefined {
