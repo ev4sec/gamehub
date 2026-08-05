@@ -13,35 +13,34 @@ export const HUB_SAVE_ID = 'hub';
 function lastPlayed(): string | null {
   const stored = readSave(HUB_SAVE_ID);
   const id = typeof stored?.last === 'string' ? stored.last : null;
-  // Verified against the registry rather than trusted: an id left over from a
-  // game that has since been renamed would otherwise strand the hero slot.
+  // Verified against the registry rather than trusted, so an id left behind by
+  // a game that has since been renamed marks nothing rather than marking wrong.
   return id && games.some((g) => g.id === id) ? id : null;
 }
 
 /**
  * The landing page.
  *
- * One hero tile across the top and eight beneath it. The old split was two
- * across then three, chosen because 2 + 3 is exactly five and nothing was left
- * stranded on a final row. Nine breaks that arithmetic: two featured plus seven
- * at three across leaves one tile alone. One plus eight divides cleanly at both
- * two columns and four, so the shape holds at every width.
+ * Nine tiles, three across, every one the same size. The count is what decides
+ * this: nine divides by three and by nothing else useful, so three rows of
+ * three is the only arrangement that leaves no tile stranded alone on a final
+ * row. Below `md` it drops to a single column, which also divides cleanly and
+ * is the right shape for a phone anyway.
  *
- * The hero is whatever was played last, which makes the first thing on the page
- * the thing most likely to be wanted. On a first visit it is the first game in
- * the registry, and the chip says so.
+ * An earlier version gave the last-played game a full-width hero tile. At
+ * nine games that tile was simply too big: it dominated the page, pushed the
+ * rest below the fold, and made the collection look like one game with eight
+ * afterthoughts. What was worth keeping is the much smaller signal, so the
+ * last-played game still gets a chip and nothing else.
  */
 export function Hub({ onSelect }: Props) {
   const last = lastPlayed();
-  const heroId = last ?? games[0]?.id;
-  const hero = games.find((g) => g.id === heroId);
-  const rest = games.filter((g) => g.id !== heroId);
 
   return (
     <div className="relative h-full overflow-y-auto">
       <Backdrop />
 
-      <main className="relative mx-auto flex min-h-full max-w-7xl flex-col px-4 py-10 md:px-6 md:py-16">
+      <main className="relative mx-auto flex min-h-full max-w-6xl flex-col px-4 py-10 md:px-6 md:py-16">
         <header className="mb-9 text-center md:mb-14">
           <h1 className="text-4xl font-black tracking-tight text-slate-100 md:text-5xl">
             Game Hub
@@ -71,20 +70,14 @@ export function Hub({ onSelect }: Props) {
             No games registered yet.
           </p>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-4">
-            {hero && (
-              <li key={hero.id} className="sm:col-span-2 lg:col-span-4">
+          <ul className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+            {games.map((game) => (
+              <li key={game.id}>
                 <Tile
-                  game={hero}
-                  featured
-                  chip={last ? 'Continue' : 'Start here'}
+                  game={game}
+                  chip={game.id === last ? 'Continue' : undefined}
                   onSelect={onSelect}
                 />
-              </li>
-            )}
-            {rest.map((game) => (
-              <li key={game.id}>
-                <Tile game={game} featured={false} onSelect={onSelect} />
               </li>
             ))}
           </ul>
@@ -97,10 +90,12 @@ export function Hub({ onSelect }: Props) {
 /**
  * The page's background art: an arcade grid under coloured light.
  *
- * Every hue is one of the five game accents, so the field belongs to the tiles
- * sitting on it rather than being decoration chosen at random. Built entirely
- * from gradients: no image files, nothing to fetch, nothing to animate, and no
- * per-frame cost on a page that already has five canvases running.
+ * Every hue is taken from a game accent, so the field belongs to the tiles
+ * sitting on it rather than being decoration chosen at random. Five pools for
+ * nine games: adding one per accent turned the whole page to mud, and the point
+ * is a coloured field rather than a legend. Built entirely from gradients: no
+ * image files, nothing to fetch, nothing to animate, and no per-frame cost on a
+ * page that already has nine canvases running.
  *
  * Fixed rather than scrolled, so the light stays put and the tiles move over it.
  */
@@ -154,12 +149,10 @@ function Backdrop() {
 
 function Tile({
   game,
-  featured,
   chip,
   onSelect,
 }: {
   game: GameEntry;
-  featured: boolean;
   chip?: string;
   onSelect: (id: string) => void;
 }) {
@@ -177,14 +170,11 @@ function Tile({
       style={{ '--accent': game.accent, '--accent-text': game.accentText } as React.CSSProperties}
       className="group block w-full overflow-hidden rounded-[20px] border border-slate-700/70 bg-[#0b1120] text-left shadow-[0_1px_2px_rgba(0,0,0,0.4)] transition-[transform,border-color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--accent)]/55 hover:shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)] focus-visible:-translate-y-0.5 focus-visible:border-[var(--accent)]/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[var(--accent)] active:translate-y-0 active:scale-[0.985] motion-reduce:transform-none"
     >
-      <div
-        className={`relative overflow-hidden ${
-          featured ? 'aspect-[16/9] lg:aspect-[21/9]' : 'aspect-[16/9]'
-        }`}
-      >
+      <div className="relative aspect-[16/9] overflow-hidden">
         {chip && (
-          // The only words that sit over artwork anywhere on this page. The
-          // hero tile is already the loudest thing here; this says why.
+          // The only words that sit over artwork anywhere on this page, and the
+          // only thing distinguishing one tile from another. Every tile is the
+          // same size now, so this has to carry "you were here" on its own.
           <span
             className="absolute left-3 top-3 z-10 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-950"
             style={{ background: 'var(--accent)' }}
@@ -236,16 +226,12 @@ function Tile({
 
       <div className="min-h-[84px] bg-gradient-to-b from-slate-900/85 to-slate-950/90 px-4 pb-4 pt-3.5 md:min-h-[92px] md:px-5 md:pb-4.5 md:pt-4">
         <span
-          className={`block font-bold tracking-tight text-slate-200 transition-colors duration-150 group-hover:text-[var(--accent-text)] group-focus-visible:text-[var(--accent-text)] ${
-            featured ? 'text-xl md:text-2xl' : 'text-xl'
-          }`}
+          className="block text-xl font-bold tracking-tight text-slate-200 transition-colors duration-150 group-hover:text-[var(--accent-text)] group-focus-visible:text-[var(--accent-text)]"
         >
           {game.title}
         </span>
         <span
-          className={`mt-1.5 block leading-snug text-slate-400 ${
-            featured ? 'text-[13px] md:text-sm' : 'text-[13px]'
-          }`}
+          className="mt-1.5 block text-[13px] leading-snug text-slate-400"
         >
           {game.blurb}
         </span>
