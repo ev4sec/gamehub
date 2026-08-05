@@ -80,6 +80,7 @@ src/
               rng.ts      Seeded random, so a soak can be replayed
               canvas.ts   Backing-store sizing, and client-to-world mapping
               touch.ts    Swipe, hold and tap recognisers. Behaviour, not look
+              keyboardNav.ts  Arrow-key navigation for menus, tiles and sheets
   shell/      The hub page and the chrome around a running game
   games/
     snake/     Engine, renderer, skins, UI. Self-contained.
@@ -123,6 +124,26 @@ different events are shared, because three copies of a recogniser will
 eventually disagree about them and nobody will notice which one changed. What is
 deliberately not shared is the look: a d-pad's colour, icons and grid belong to
 the game drawing it.
+
+## On a keyboard
+
+The whole collection is playable without a mouse. Arrow keys move between the
+tiles on the hub, between the modes on a game's menu, and between the actions on
+whatever sheet is showing; Enter opens what is highlighted. The highlight is
+deliberately loud, because the thing being selected is a piece of artwork rather
+than a line of text and a hairline ring gets lost on it.
+
+That is one hook, mounted once by the shell, and every surface opts in with a
+`data-` attribute. Nine games own their own menus and overlays and the shell is
+forbidden from importing any of them, so a marker in the DOM is the seam that
+already exists rather than a new one.
+
+It listens in the capture phase, which is the part worth knowing. Every game
+registers its own window `keydown` in the bubble phase to move a piece, so
+running first is what stops navigating a sheet from also steering the board
+underneath it. The exception is a sheet with a single action: several games start
+a run when a direction is pressed on the opening banner, so the arrows are only
+claimed when there is a choice to make.
 
 ## On a phone
 

@@ -70,12 +70,15 @@ export function Hub({ onSelect }: Props) {
             No games registered yet.
           </p>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+          <ul data-nav-grid className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
             {games.map((game) => (
               <li key={game.id}>
                 <Tile
                   game={game}
                   chip={game.id === last ? 'Continue' : undefined}
+                  // The first arrow press lands here rather than on the first
+                  // tile, so picking up where you left off costs one key.
+                  initial={game.id === last}
                   onSelect={onSelect}
                 />
               </li>
@@ -150,10 +153,12 @@ function Backdrop() {
 function Tile({
   game,
   chip,
+  initial,
   onSelect,
 }: {
   game: GameEntry;
   chip?: string;
+  initial?: boolean;
   onSelect: (id: string) => void;
 }) {
   const preview = previews[game.id];
@@ -167,8 +172,9 @@ function Tile({
       // byte of game code in the entry bundle.
       onPointerEnter={() => void game.load().catch(() => {})}
       onFocus={() => void game.load().catch(() => {})}
+      {...(initial ? { 'data-nav-initial': true } : {})}
       style={{ '--accent': game.accent, '--accent-text': game.accentText } as React.CSSProperties}
-      className="group block w-full overflow-hidden rounded-[20px] border border-slate-700/70 bg-[#0b1120] text-left shadow-[0_1px_2px_rgba(0,0,0,0.4)] transition-[transform,border-color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--accent)]/55 hover:shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)] focus-visible:-translate-y-0.5 focus-visible:border-[var(--accent)]/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[var(--accent)] active:translate-y-0 active:scale-[0.985] motion-reduce:transform-none"
+      className="group block w-full overflow-hidden rounded-[20px] border border-slate-700/70 bg-[#0b1120] text-left shadow-[0_1px_2px_rgba(0,0,0,0.4)] transition-[transform,border-color,box-shadow] duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--accent)]/55 hover:shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)] focus:-translate-y-0.5 focus:border-[var(--accent)]/55 focus:outline focus:outline-[3px] focus:outline-offset-[3px] focus:outline-[var(--accent)] active:translate-y-0 active:scale-[0.985] motion-reduce:transform-none"
     >
       <div className="relative aspect-[16/9] overflow-hidden">
         {chip && (
@@ -193,13 +199,13 @@ function Tile({
         />
 
         {preview && (
-          <div className="absolute inset-0 opacity-70 saturate-[0.85] transition duration-200 group-hover:scale-[1.015] group-hover:opacity-100 group-hover:saturate-100 group-focus-visible:opacity-100 group-focus-visible:saturate-100 motion-reduce:transform-none">
+          <div className="absolute inset-0 opacity-70 saturate-[0.85] transition duration-200 group-hover:scale-[1.015] group-hover:opacity-100 group-hover:saturate-100 group-focus:opacity-100 group-focus:saturate-100 motion-reduce:transform-none">
             <PreviewCanvas gameId={game.id} spec={preview} />
           </div>
         )}
 
         <span
-          className="absolute bottom-3 right-2.5 inline-flex translate-y-1 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-950 opacity-0 transition duration-150 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
+          className="absolute bottom-3 right-2.5 inline-flex translate-y-1 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-slate-950 opacity-0 transition duration-150 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-focus:translate-y-0 group-focus:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100"
           style={{ background: 'var(--accent)' }}
         >
           {/* Drawn inline rather than imported from lucide. The hub is the
@@ -215,7 +221,7 @@ function Tile({
         {/* The seam between the art and the text, and the tile's clearest
             accent. Brightens with hover and focus alike. */}
         <span
-          className="absolute inset-x-0 bottom-0 h-0.5 opacity-35 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+          className="absolute inset-x-0 bottom-0 h-0.5 opacity-35 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100"
           style={{
             background:
               'linear-gradient(90deg, transparent 0%, var(--accent) 22%, var(--accent) 78%, transparent 100%)',
@@ -226,7 +232,7 @@ function Tile({
 
       <div className="min-h-[84px] bg-gradient-to-b from-slate-900/85 to-slate-950/90 px-4 pb-4 pt-3.5 md:min-h-[92px] md:px-5 md:pb-4.5 md:pt-4">
         <span
-          className="block text-xl font-bold tracking-tight text-slate-200 transition-colors duration-150 group-hover:text-[var(--accent-text)] group-focus-visible:text-[var(--accent-text)]"
+          className="block text-xl font-bold tracking-tight text-slate-200 transition-colors duration-150 group-hover:text-[var(--accent-text)] group-focus:text-[var(--accent-text)]"
         >
           {game.title}
         </span>

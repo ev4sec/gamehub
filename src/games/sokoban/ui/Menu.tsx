@@ -33,7 +33,7 @@ export function Menu({ save, onStart, onToggleSound, onExit }: Props) {
         </button>
       </div>
 
-      <ul className="grid gap-3 sm:grid-cols-2">
+      <ul data-nav-grid className="grid gap-3 sm:grid-cols-2">
         {LEVELS.map((level, index) => {
           const best = bestFor(save, index);
           return (

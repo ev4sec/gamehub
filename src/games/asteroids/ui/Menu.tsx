@@ -33,7 +33,7 @@ export function Menu({ save, onStart, onToggleSound, onToggleHanded, onExit }: P
         </button>
       </div>
 
-      <ul className="grid gap-3">
+      <ul data-nav-grid className="grid gap-3">
         {MODES.map((mode) => (
           <li key={mode}>
             <button

@@ -14,6 +14,7 @@ import {
   click,
   frames,
   pendingFrames,
+  press,
   setReducedMotion,
   settle,
   text,
@@ -138,6 +139,46 @@ async function main() {
   setReducedMotion(false);
   await settle();
   check(pendingFrames() > 0, 'animation resumes when motion is allowed again');
+
+  section('hub: the keyboard walks the tiles');
+  {
+    // Driven from nothing focused, which is the state a player actually arrives
+    // in. In a headless DOM every offsetTop is zero, so the grid collapses to a
+    // single row and all four arrows walk the list; the two-dimensional half of
+    // this is real-browser territory and is not claimed to be covered here.
+    const titleOf = () => document.activeElement?.textContent ?? '';
+
+    press('ArrowRight');
+    await settle();
+    check(
+      titleOf().includes(games[0].title),
+      `the first press lands on ${games[0].title}, saw '${titleOf().slice(0, 24)}'`,
+    );
+
+    press('ArrowRight');
+    await settle();
+    check(titleOf().includes(games[1].title), `right moved on to ${games[1].title}`);
+
+    press('ArrowLeft');
+    await settle();
+    check(titleOf().includes(games[0].title), 'left came back');
+
+    press('End');
+    await settle();
+    const lastGame = games[games.length - 1];
+    check(titleOf().includes(lastGame.title), `End jumped to ${lastGame.title}`);
+
+    press('Home');
+    await settle();
+    check(titleOf().includes(games[0].title), 'Home came back to the first');
+
+    press('Enter');
+    await until(() => !text().includes(HUB_TITLE), 'Enter to open the highlighted game');
+    check(!text().includes(HUB_TITLE), 'Enter opened it');
+
+    await backToHub();
+    check(text().includes(HUB_TITLE), 'and it is leavable as usual');
+  }
 
   section('hub: every control has a name');
   check(namelessButtons().length === 0, `no nameless buttons on the hub`);

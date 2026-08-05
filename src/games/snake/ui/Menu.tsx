@@ -39,7 +39,7 @@ export function Menu({ save, onStart, onSetSkin, onToggleSound, onExit }: Props)
         </p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div data-nav-grid className="grid gap-3 sm:grid-cols-2">
         {MODES.map((mode) => {
           const meta = MODE_META[mode];
           const best = save.bests[mode] ?? 0;
