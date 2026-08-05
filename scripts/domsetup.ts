@@ -198,6 +198,29 @@ export function release(key: string, code?: string): void {
   );
 }
 
+/**
+ * A pointer press at a point, for the games whose input is "where you touched"
+ * rather than a key. jsdom ships no `PointerEvent`, so this is a MouseEvent
+ * carrying the `pointerdown` type: React dispatches on the event name, and the
+ * handlers only ever read `clientX`, `clientY` and `pointerType`.
+ */
+export function pointerDown(
+  el: Element,
+  clientX = 0,
+  clientY = 0,
+  pointerType = 'touch',
+): void {
+  const ev = new w.MouseEvent('pointerdown', {
+    bubbles: true,
+    cancelable: true,
+    clientX,
+    clientY,
+  });
+  (ev as any).pointerId = 1;
+  (ev as any).pointerType = pointerType;
+  el.dispatchEvent(ev);
+}
+
 /** A press and its release, for input that is not meant to be held. */
 export function tap(key: string, code?: string): void {
   press(key, code);

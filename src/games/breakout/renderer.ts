@@ -5,6 +5,7 @@ import {
   PADDLE_Y,
   POWER_META,
 } from './engine/constants';
+import { fitWorld, sizeCanvas } from '../../platform/canvas';
 import type { GameState } from './engine/types';
 
 /**
@@ -25,20 +26,17 @@ export class Renderer {
   }
 
   resize(): void {
-    const rect = this.canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    const cssWidth = Math.max(rect.width, MIN_WIDTH_PX);
-    const cssHeight = Math.max(rect.height, MIN_WIDTH_PX * (FIELD_H / FIELD_W));
-
-    this.canvas.width = Math.round(cssWidth * dpr);
-    this.canvas.height = Math.round(cssHeight * dpr);
+    const size = sizeCanvas(this.canvas, {
+      minCssWidth: MIN_WIDTH_PX,
+      minCssHeight: MIN_WIDTH_PX * (FIELD_H / FIELD_W),
+    });
 
     // The playfield is in world units and never changes shape, so everything
     // is drawn through one uniform scale rather than being laid out per size.
-    this.scale = Math.min(this.canvas.width / FIELD_W, this.canvas.height / FIELD_H);
-    this.offsetX = (this.canvas.width - FIELD_W * this.scale) / 2;
-    this.offsetY = (this.canvas.height - FIELD_H * this.scale) / 2;
+    const fit = fitWorld(size, FIELD_W, FIELD_H);
+    this.scale = fit.scale;
+    this.offsetX = fit.offsetX;
+    this.offsetY = fit.offsetY;
   }
 
   draw(s: GameState): void {

@@ -57,6 +57,50 @@ export const SOKOBAN = {
   player: '#7dd3fc',
 };
 
+/** From games/missile/renderer.ts, and WAVE_COLORS in its engine constants. */
+export const MISSILE = {
+  trail: '#f87171',
+  city: '#7dd3fc',
+  battery: '#fb923c',
+  ammo: '#fed7aa',
+  interceptor: '#e2e8f0',
+  blastCore: '#fef08a',
+  blastEdge: '#fb923c',
+  ground: '#1e293b',
+};
+
+/** From games/frogger/engine/constants.ts, COLORS. */
+export const FROGGER = {
+  road: '#0b1120',
+  river: '#082f49',
+  bank: '#1a2e05',
+  frog: '#a3e635',
+  frogEdge: '#365314',
+  log: '#a16207',
+  logGrain: '#713f12',
+  cars: ['#f87171', '#38bdf8', '#fbbf24'],
+};
+
+/** From games/asteroids/engine/constants.ts, COLORS. */
+export const ASTEROIDS = {
+  ship: '#e2e8f0',
+  thrust: '#e879f9',
+  rock: '#cbd5e1',
+  bullet: '#f0abfc',
+};
+
+/** From games/mazechase/engine/constants.ts, COLORS. */
+export const MAZECHASE = {
+  field: '#020617',
+  wall: '#2563eb',
+  wallShadow: '#1e3a8a',
+  dot: '#e2e8f0',
+  pellet: '#fdba74',
+  hero: '#fb923c',
+  blinky: '#fb7185',
+  inky: '#38bdf8',
+};
+
 export const FIELD = {
   grid: 'rgba(148, 163, 184, 0.07)',
   panel: 'rgba(30, 41, 59, 0.5)',

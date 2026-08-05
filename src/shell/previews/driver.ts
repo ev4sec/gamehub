@@ -32,6 +32,8 @@ interface Entry {
   dirty: boolean;
   visible: boolean;
   frames: number;
+  /** True once this entry has been given its still frame under reduced motion. */
+  stilled: boolean;
 }
 
 /** Ambient decoration; half the frames of a game, for no perceptible loss. */
@@ -97,8 +99,21 @@ function paintOne(entry: Entry, t: number): void {
   entry.canvas.setAttribute('data-preview-frame', String(entry.frames));
 }
 
+/**
+ * Paints the entries that still need a still frame, and only those.
+ *
+ * `registerPreview` calls `ensureRunning`, which lands here when motion is
+ * refused, so without the guard the n-th canvas to register repaints all n.
+ * Measured at five previews that was thirty full-canvas paints where five were
+ * needed; at nine it would be ninety, in one synchronous commit, on the
+ * accessibility path of all things.
+ */
 function paintStills(): void {
-  for (const entry of entries) paintOne(entry, entry.spec.stillMs);
+  for (const entry of entries) {
+    if (entry.stilled) continue;
+    paintOne(entry, entry.spec.stillMs);
+    entry.stilled = true;
+  }
 }
 
 function anyVisible(): boolean {
@@ -137,6 +152,10 @@ function ensureRunning(): void {
     paintStills();
     return;
   }
+  // Motion is allowed again, so the still frames are no longer current. Cleared
+  // here rather than in the media-query handler, which is the one place both
+  // transitions pass through.
+  for (const entry of entries) entry.stilled = false;
   if (raf !== 0) return;
   if (typeof document !== 'undefined' && document.hidden) return;
   if (!anyVisible()) return;
@@ -220,6 +239,7 @@ export function registerPreview(
     // mean "nothing animates", or the headless suite would test nothing at all.
     visible: true,
     frames: 0,
+    stilled: false,
   };
 
   attach();
@@ -237,8 +257,22 @@ export function registerPreview(
   };
 }
 
-/** Marks a preview for re-measurement on the next painted frame. */
+/**
+ * Marks a preview for re-measurement on the next painted frame.
+ *
+ * Under reduced motion there is no next frame, so the repaint has to happen
+ * here or the canvas keeps a stale backing store against a changed CSS box and
+ * shows stretched art until motion is allowed again. An orientation change or
+ * a retracting URL bar is enough to trigger it.
+ */
 export function invalidateSize(canvas: HTMLCanvasElement): void {
   const entry = byCanvas.get(canvas);
-  if (entry) entry.dirty = true;
+  if (!entry) return;
+
+  entry.dirty = true;
+  if (!reducedMotion()) return;
+
+  entry.stilled = false;
+  paintOne(entry, entry.spec.stillMs);
+  entry.stilled = true;
 }

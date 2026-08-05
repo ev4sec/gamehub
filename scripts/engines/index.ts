@@ -3,6 +3,10 @@ import { tetrisEngineChecks } from './tetris';
 import { twentyFortyEightEngineChecks } from './2048';
 import { breakoutEngineChecks } from './breakout';
 import { sokobanEngineChecks } from './sokoban';
+import { missileEngineChecks } from './missile';
+import { froggerEngineChecks } from './frogger';
+import { asteroidsEngineChecks } from './asteroids';
+import { mazechaseEngineChecks } from './mazechase';
 
 /**
  * Per-game engine checks, keyed by registry id.
@@ -18,4 +22,8 @@ export const engineChecks: Record<string, () => void> = {
   '2048': twentyFortyEightEngineChecks,
   breakout: breakoutEngineChecks,
   sokoban: sokobanEngineChecks,
+  missile: missileEngineChecks,
+  frogger: froggerEngineChecks,
+  asteroids: asteroidsEngineChecks,
+  mazechase: mazechaseEngineChecks,
 };

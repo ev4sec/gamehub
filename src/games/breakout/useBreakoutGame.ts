@@ -182,6 +182,23 @@ export function useBreakoutGame(canvasRef: RefObject<HTMLCanvasElement | null>) 
     setPointer(s, clientX === null || !renderer ? null : renderer.toWorldX(clientX));
   }, []);
 
+  /**
+   * The three pieces a relative drag needs. A finger is not a mouse: steering
+   * absolutely means the paddle teleports under the touch and then the thumb
+   * sits on the field, covering the half of it the ball is about to land in.
+   */
+  const paddleX = useCallback(() => stateRef.current?.paddle.x ?? null, []);
+
+  const worldXOf = useCallback(
+    (clientX: number) => rendererRef.current?.toWorldX(clientX) ?? null,
+    [],
+  );
+
+  const pointAtWorld = useCallback((worldX: number | null) => {
+    const s = stateRef.current;
+    if (s) setPointer(s, worldX);
+  }, []);
+
   const togglePause = useCallback(() => {
     const s = stateRef.current;
     if (!s) return;
@@ -217,6 +234,9 @@ export function useBreakoutGame(canvasRef: RefObject<HTMLCanvasElement | null>) 
     launch,
     hold,
     pointAt,
+    paddleX,
+    worldXOf,
+    pointAtWorld,
     togglePause,
     nextLevel,
     toggleSound,

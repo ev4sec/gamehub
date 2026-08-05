@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import type { GameProps } from '../../platform/game';
+import { swipeHandlers } from '../../platform/touch';
 import type { Dir } from './engine/types';
 import { Board } from './ui/Board';
 import { Hud } from './ui/Hud';
@@ -22,11 +23,7 @@ const KEY_DIRS: Record<string, Dir> = {
   D: 'right',
 };
 
-/** Minimum travel, in pixels, before a touch counts as a swipe. */
-const SWIPE_THRESHOLD = 24;
-
 export default function Game2048({ onExit }: GameProps) {
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const game = use2048Game();
 
   const { mode, hud, play, undo, restart, quit } = game;
@@ -64,7 +61,7 @@ export default function Game2048({ onExit }: GameProps) {
   // that sets the mode, so the two always arrive together.
   if (!mode) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-100">
+      <main className="game-shell">
         <Menu
           save={game.save}
           onStart={game.start}
@@ -76,7 +73,7 @@ export default function Game2048({ onExit }: GameProps) {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-6 text-slate-100">
+    <main className="game-shell">
       <div className="w-full max-w-[min(92vw,32rem)]">
         {hud && (
           <Hud
@@ -90,26 +87,12 @@ export default function Game2048({ onExit }: GameProps) {
 
         {hud && (
           <div
-            className="relative mt-3"
+            className="relative mt-3 touch-none"
             // Exact counters for the smoke suite to read. Scraping these out of
             // the rendered text would break on any wording change.
             data-moves={hud.moves}
             data-score={hud.score}
-            onTouchStart={(e) => {
-              const t = e.touches[0];
-              touchStart.current = { x: t.clientX, y: t.clientY };
-            }}
-            onTouchEnd={(e) => {
-              const origin = touchStart.current;
-              touchStart.current = null;
-              if (!origin) return;
-              const t = e.changedTouches[0];
-              const dx = t.clientX - origin.x;
-              const dy = t.clientY - origin.y;
-              if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD) return;
-              if (Math.abs(dx) > Math.abs(dy)) play(dx > 0 ? 'right' : 'left');
-              else play(dy > 0 ? 'down' : 'up');
-            }}
+            {...swipeHandlers(play)}
           >
             <Board size={hud.size} tiles={game.tiles} fading={game.fading} />
             <Overlays

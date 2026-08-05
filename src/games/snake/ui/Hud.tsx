@@ -24,8 +24,8 @@ export function Hud({ hud, save, onPause, onQuit }: Props) {
 
   return (
     <div className="w-full">
-      <div className="flex items-end justify-between gap-4">
-        <div className="flex items-end gap-5">
+      <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <div className="flex items-end gap-3 sm:gap-5">
           <Stat label="Score" value={hud.score.toLocaleString()} tone="text-emerald-300" />
           <Stat
             label="Best"
@@ -38,12 +38,12 @@ export function Hud({ hud, save, onPause, onQuit }: Props) {
           )}
         </div>
 
-        <div className="flex items-end gap-5">
+        <div className="flex items-end gap-3 sm:gap-5">
           {hud.mode === 'timeAttack' && (
             <Stat
               label="Time"
               value={formatClock(hud.timeLeft)}
-              tone={lowTime ? 'text-red-400 animate-pulse' : 'text-sky-300'}
+              tone={lowTime ? 'text-red-400 animate-pulse motion-reduce:animate-none' : 'text-sky-300'}
             />
           )}
           {hud.mode === 'maze' && (
@@ -66,14 +66,14 @@ export function Hud({ hud, save, onPause, onQuit }: Props) {
           <button
             onClick={onPause}
             aria-label={paused ? 'Resume' : 'Pause'}
-            className="rounded-lg border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition hover:border-slate-500 hover:text-white"
           >
             {paused ? <Play size={16} /> : <Pause size={16} />}
           </button>
           <button
             onClick={onQuit}
             aria-label="Back to menu"
-            className="rounded-lg border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition hover:border-slate-500 hover:text-white"
           >
             <Home size={16} />
           </button>

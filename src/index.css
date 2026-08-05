@@ -24,5 +24,69 @@
   /* Arrow keys and space are game input, never scrolling. */
   #root {
     overflow: hidden;
+    /*
+     * The one place the viewport height is decided, so no game has to.
+     * A percentage height resolves against the initial containing block, which
+     * mobile browsers measure with the toolbars retracted; `dvh` tracks what is
+     * actually visible. Without this, every game's root is 60 to 100px taller
+     * than the box clipping it, and the bottom of the screen, which is exactly
+     * where the touch controls sit, is unreachable.
+     */
+    height: 100dvh;
+    /* A long press on a d-pad should steer, not raise the iOS callout menu. */
+    -webkit-touch-callout: none;
+  }
+}
+
+@layer components {
+  /*
+   * The root element of every game screen.
+   *
+   * Scrolls internally rather than being clipped by `#root`, which is the only
+   * way a tall menu on a short phone stays reachable. The children take auto
+   * block margins instead of `justify-content: center` on purpose: a centred
+   * flex child whose content overflows pushes its own top edge out of the
+   * scrollable area, and no scroll gesture can bring it back.
+   */
+  .game-shell {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    background-color: #020617;
+    color: #f1f5f9;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
+  .game-shell > * {
+    margin-block: auto;
+  }
+
+  /* The sweep on the loading bar between the hub and a game. */
+  .loading-sweep {
+    animation: gamehub-sweep 1.2s ease-in-out infinite;
+  }
+
+  /*
+   * Refusing motion does not mean refusing the indicator. The bar holds still
+   * at a third full, which still says "something is happening" without moving.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .loading-sweep {
+      animation: none;
+    }
+  }
+}
+
+@keyframes gamehub-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(333%);
   }
 }

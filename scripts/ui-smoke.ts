@@ -39,6 +39,23 @@ function previewFrames(): Record<string, number> {
 
 const HUB_TITLE = 'Game Hub';
 
+/**
+ * Every button must be findable by name.
+ *
+ * Nine games with icon-only pause and home buttons, five d-pads and two hold
+ * pads is exactly the surface where an unlabelled icon button appears, and the
+ * harness's own `buttonWith` matcher depends on those labels existing. This
+ * lands green today, so it only ever fires on a regression.
+ */
+function namelessButtons(): string[] {
+  const bad: string[] = [];
+  for (const button of document.querySelectorAll('button')) {
+    const name = `${button.textContent ?? ''} ${button.getAttribute('aria-label') ?? ''}`;
+    if (name.trim() === '') bad.push(button.className.slice(0, 40) || '(no class)');
+  }
+  return bad;
+}
+
 async function backToHub(): Promise<void> {
   click(buttonWith(EXIT_LABEL));
   await until(() => text().includes(HUB_TITLE), 'the hub after leaving a game');
@@ -122,6 +139,15 @@ async function main() {
   await settle();
   check(pendingFrames() > 0, 'animation resumes when motion is allowed again');
 
+  section('hub: every control has a name');
+  check(namelessButtons().length === 0, `no nameless buttons on the hub`);
+
+  // The hub is running exactly one loop: the preview driver's. Every game must
+  // leave this number where it found it, which is the check that catches a
+  // `startLoop` outliving the component that started it. That defect is
+  // otherwise invisible, because the game is gone and nothing looks wrong.
+  const loopBaseline = pendingFrames();
+
   for (const game of games) {
     section(`${game.title}: wiring`);
 
@@ -161,9 +187,32 @@ async function main() {
       () => !text().includes(HUB_TITLE),
       `${game.title} to mount for its deep checks`,
     );
+
+    check(
+      namelessButtons().length === 0,
+      `${game.title} has no nameless buttons on its menu`,
+    );
+
     await deep();
+
+    // Checked after the deep flow rather than before it, so the in-game HUD,
+    // the overlays and the touch pads are covered rather than just the menu.
+    check(
+      namelessButtons().length === 0,
+      `${game.title} has no nameless buttons in play`,
+    );
+
     await backToHub();
     check(text().includes(HUB_TITLE), `${game.title} returns to the hub when done`);
+
+    await until(
+      () => pendingFrames() === loopBaseline,
+      `${game.title} to leave no loop running behind it`,
+    );
+    check(
+      pendingFrames() === loopBaseline,
+      `${game.title} left no loop behind`,
+    );
   }
 
   const failures = failureCount();

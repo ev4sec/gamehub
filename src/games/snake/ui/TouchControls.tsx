@@ -14,7 +14,7 @@ const PAD: { dir: Dir; icon: React.ReactNode; area: string }[] = [
 
 export function TouchControls({ onTurn }: Props) {
   return (
-    <div className="mx-auto mt-5 grid w-44 grid-cols-3 grid-rows-2 gap-2 lg:hidden">
+    <div className="mx-auto mt-5 grid w-44 grid-cols-3 grid-rows-2 gap-2 [@media(hover:hover)]:hidden">
       {PAD.map(({ dir, icon, area }) => (
         <button
           key={dir}
@@ -25,7 +25,7 @@ export function TouchControls({ onTurn }: Props) {
             e.preventDefault();
             onTurn(dir);
           }}
-          className={`${area} flex h-14 items-center justify-center rounded-xl border border-slate-700 bg-slate-800/60 text-slate-300 transition active:border-emerald-400 active:text-emerald-300`}
+          className={`${area} flex h-14 touch-manipulation select-none items-center justify-center rounded-xl border border-slate-700 bg-slate-800/60 text-slate-300 transition active:border-emerald-400 active:text-emerald-300`}
         >
           {icon}
         </button>

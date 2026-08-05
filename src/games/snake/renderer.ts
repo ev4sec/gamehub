@@ -1,3 +1,4 @@
+import { MAX_DPR } from '../../platform/canvas';
 import { MAGNET_RADIUS, POWER_META, cellKey } from './engine/constants';
 import { hasEffect } from './engine/engine';
 import type { GameEvent, GameState, Vec } from './engine/types';
@@ -93,15 +94,25 @@ export class Renderer {
     this.skin = skin;
   }
 
-  /** Sizes the backing store to the device pixel ratio so nothing is blurry. */
+  /**
+   * Sizes the backing store so nothing is blurry, at a ratio the phone can
+   * actually afford. This used to take `devicePixelRatio` raw; on a handset
+   * reporting 3 that is 2.25 times the fill rate of a capped canvas, on the
+   * most expensive renderer in the project, for a difference no eye resolves.
+   *
+   * The two guarded assignments are not micro-optimisation. Writing
+   * `canvas.width` clears the backing store even when the value is unchanged,
+   * and a ResizeObserver fires on any layout pass, so an unrelated reflow used
+   * to blank the frame. The element's size is left to its own classes.
+   */
   resize(cssSize: number, grid: number): void {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
     this.size = cssSize;
     this.cell = cssSize / grid;
-    this.canvas.width = Math.round(cssSize * dpr);
-    this.canvas.height = Math.round(cssSize * dpr);
-    this.canvas.style.width = `${cssSize}px`;
-    this.canvas.style.height = `${cssSize}px`;
+
+    const px = Math.round(cssSize * dpr);
+    if (this.canvas.width !== px) this.canvas.width = px;
+    if (this.canvas.height !== px) this.canvas.height = px;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 

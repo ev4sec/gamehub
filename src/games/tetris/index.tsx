@@ -97,7 +97,7 @@ export default function TetrisGame({ onExit }: GameProps) {
   // once we are past this branch.
   if (!mode) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-100">
+      <main className="game-shell">
         <Menu
           save={game.save}
           onStart={game.start}
@@ -109,7 +109,7 @@ export default function TetrisGame({ onExit }: GameProps) {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-6 text-slate-100">
+    <main className="game-shell">
       <div className="w-full max-w-xl">
         {hud && <Hud hud={hud} save={game.save} onPause={togglePause} onQuit={quit} />}
 

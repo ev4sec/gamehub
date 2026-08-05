@@ -1,3 +1,4 @@
+import { readSave } from '../platform/save';
 import { games, type GameEntry } from '../platform/registry';
 import { previews } from './previews';
 import { PreviewCanvas } from './previews/PreviewCanvas';
@@ -6,34 +7,63 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
+/** Where the shell records the last game opened. Not a game's save; the hub's. */
+export const HUB_SAVE_ID = 'hub';
+
+function lastPlayed(): string | null {
+  const stored = readSave(HUB_SAVE_ID);
+  const id = typeof stored?.last === 'string' ? stored.last : null;
+  // Verified against the registry rather than trusted: an id left over from a
+  // game that has since been renamed would otherwise strand the hero slot.
+  return id && games.some((g) => g.id === id) ? id : null;
+}
+
 /**
  * The landing page.
  *
- * Five games, laid out two across and then three across. That is not an
- * arbitrary split: 2 + 3 is exactly five, so no tile is ever left stranded
- * alone on a final row, and registry order already puts the two largest games
- * in the featured slots without any reordering logic.
+ * One hero tile across the top and eight beneath it. The old split was two
+ * across then three, chosen because 2 + 3 is exactly five and nothing was left
+ * stranded on a final row. Nine breaks that arithmetic: two featured plus seven
+ * at three across leaves one tile alone. One plus eight divides cleanly at both
+ * two columns and four, so the shape holds at every width.
+ *
+ * The hero is whatever was played last, which makes the first thing on the page
+ * the thing most likely to be wanted. On a first visit it is the first game in
+ * the registry, and the chip says so.
  */
 export function Hub({ onSelect }: Props) {
+  const last = lastPlayed();
+  const heroId = last ?? games[0]?.id;
+  const hero = games.find((g) => g.id === heroId);
+  const rest = games.filter((g) => g.id !== heroId);
+
   return (
     <div className="relative h-full overflow-y-auto">
       <Backdrop />
 
-      <main className="relative mx-auto flex min-h-full max-w-6xl flex-col px-4 py-10 md:px-6 md:py-16">
+      <main className="relative mx-auto flex min-h-full max-w-7xl flex-col px-4 py-10 md:px-6 md:py-16">
         <header className="mb-9 text-center md:mb-14">
           <h1 className="text-4xl font-black tracking-tight text-slate-100 md:text-5xl">
             Game Hub
           </h1>
-          {/* The five game accents, in registry order, as one rule. It is the
-              only place the whole palette appears together. */}
+          {/*
+            One segment per game, in registry order. This used to be a single
+            gradient through every accent, which at five hues was a spectrum and
+            at nine is mud. Discrete segments read as "nine games" in the first
+            second, which the gradient never did at any count.
+          */}
           <span
-            className="mx-auto mt-5 block h-px w-56 max-w-full"
-            style={{
-              background:
-                'linear-gradient(90deg, transparent 0%, #34d399 18%, #22d3ee 35%, #fbbf24 52%, #38bdf8 69%, #a78bfa 86%, transparent 100%)',
-            }}
+            className="mx-auto mt-5 flex max-w-full items-center justify-center gap-1"
             aria-hidden
-          />
+          >
+            {games.map((game) => (
+              <span
+                key={game.id}
+                className="block h-[3px] w-4 rounded-full"
+                style={{ background: game.accent }}
+              />
+            ))}
+          </span>
         </header>
 
         {games.length === 0 ? (
@@ -41,13 +71,20 @@ export function Hub({ onSelect }: Props) {
             No games registered yet.
           </p>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 md:grid-cols-6 md:gap-5">
-            {games.map((game, index) => (
-              <li
-                key={game.id}
-                className={index < 2 ? 'md:col-span-3' : 'md:col-span-2'}
-              >
-                <Tile game={game} featured={index < 2} onSelect={onSelect} />
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-4">
+            {hero && (
+              <li key={hero.id} className="sm:col-span-2 lg:col-span-4">
+                <Tile
+                  game={hero}
+                  featured
+                  chip={last ? 'Continue' : 'Start here'}
+                  onSelect={onSelect}
+                />
+              </li>
+            )}
+            {rest.map((game) => (
+              <li key={game.id}>
+                <Tile game={game} featured={false} onSelect={onSelect} />
               </li>
             ))}
           </ul>
@@ -118,10 +155,12 @@ function Backdrop() {
 function Tile({
   game,
   featured,
+  chip,
   onSelect,
 }: {
   game: GameEntry;
   featured: boolean;
+  chip?: string;
   onSelect: (id: string) => void;
 }) {
   const preview = previews[game.id];
@@ -140,9 +179,20 @@ function Tile({
     >
       <div
         className={`relative overflow-hidden ${
-          featured ? 'aspect-[16/9]' : 'aspect-[16/9] md:aspect-[4/3]'
+          featured ? 'aspect-[16/9] lg:aspect-[21/9]' : 'aspect-[16/9]'
         }`}
       >
+        {chip && (
+          // The only words that sit over artwork anywhere on this page. The
+          // hero tile is already the loudest thing here; this says why.
+          <span
+            className="absolute left-3 top-3 z-10 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-950"
+            style={{ background: 'var(--accent)' }}
+          >
+            {chip}
+          </span>
+        )}
+
         <div
           className="absolute inset-0"
           style={{

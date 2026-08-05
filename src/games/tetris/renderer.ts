@@ -1,3 +1,4 @@
+import { fitWorld, sizeCanvas } from '../../platform/canvas';
 import { BOARD_H, BOARD_W, BUFFER_H, COLORS, SHAPES, VISIBLE_H } from './engine/constants';
 import { ghostY } from './engine/engine';
 import type { GameState } from './engine/types';
@@ -22,20 +23,17 @@ export class Renderer {
   }
 
   resize(): void {
-    const rect = this.canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const size = sizeCanvas(this.canvas, {
+      minCssWidth: MIN_WIDTH_PX,
+      minCssHeight: MIN_WIDTH_PX * (VISIBLE_H / BOARD_W),
+    });
+    this.width = size.width;
+    this.height = size.height;
 
-    const cssWidth = Math.max(rect.width, MIN_WIDTH_PX);
-    const cssHeight = Math.max(rect.height, MIN_WIDTH_PX * (VISIBLE_H / BOARD_W));
-
-    this.canvas.width = Math.round(cssWidth * dpr);
-    this.canvas.height = Math.round(cssHeight * dpr);
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
-
-    this.cell = Math.min(this.width / BOARD_W, this.height / VISIBLE_H);
-    this.originX = (this.width - this.cell * BOARD_W) / 2;
-    this.originY = (this.height - this.cell * VISIBLE_H) / 2;
+    const fit = fitWorld(size, BOARD_W, VISIBLE_H);
+    this.cell = fit.scale;
+    this.originX = fit.offsetX;
+    this.originY = fit.offsetY;
   }
 
   private block(x: number, y: number, color: string, alpha: number): void {

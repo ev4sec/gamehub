@@ -27,7 +27,7 @@ export function Menu({ save, onStart, onToggleSound, onExit }: Props) {
         <button
           onClick={onToggleSound}
           aria-label={save.sound ? 'Mute sound' : 'Unmute sound'}
-          className="rounded-lg border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition hover:border-slate-500 hover:text-white"
         >
           {save.sound ? <Volume2 size={16} /> : <VolumeX size={16} />}
         </button>

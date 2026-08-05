@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { GameProps } from '../../platform/game';
+import { swipeHandlers } from '../../platform/touch';
 import { useSnakeGame } from './useSnakeGame';
 import type { Dir } from './engine/types';
 import { Hud } from './ui/Hud';
@@ -22,12 +23,8 @@ const KEY_DIRS: Record<string, Dir> = {
   D: 'right',
 };
 
-/** Minimum travel, in pixels, before a touch counts as a swipe. */
-const SWIPE_THRESHOLD = 24;
-
 export default function SnakeGame({ onExit }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const game = useSnakeGame(canvasRef);
 
   const { mode, hud, turn, togglePause, restart, quit, continueLevel } = game;
@@ -65,7 +62,7 @@ export default function SnakeGame({ onExit }: GameProps) {
   // once we are past this branch.
   if (!mode) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-100">
+      <main className="game-shell">
         <Menu
           save={game.save}
           onStart={game.start}
@@ -78,27 +75,16 @@ export default function SnakeGame({ onExit }: GameProps) {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-6 text-slate-100">
+    <main className="game-shell">
       <div className="w-full max-w-[min(88vw,68vh)]">
         {hud && <Hud hud={hud} save={game.save} onPause={togglePause} onQuit={quit} />}
 
         <div
-          className="relative mt-3 aspect-square w-full overflow-hidden rounded-2xl border-2 border-slate-700/80 shadow-2xl shadow-black/50"
-          onTouchStart={(e) => {
-            const t = e.touches[0];
-            touchStart.current = { x: t.clientX, y: t.clientY };
-          }}
-          onTouchEnd={(e) => {
-            const origin = touchStart.current;
-            touchStart.current = null;
-            if (!origin) return;
-            const t = e.changedTouches[0];
-            const dx = t.clientX - origin.x;
-            const dy = t.clientY - origin.y;
-            if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD) return;
-            if (Math.abs(dx) > Math.abs(dy)) turn(dx > 0 ? 'right' : 'left');
-            else turn(dy > 0 ? 'down' : 'up');
-          }}
+          className="relative mt-3 aspect-square w-full touch-none overflow-hidden rounded-2xl border-2 border-slate-700/80 shadow-2xl shadow-black/50"
+          // Resolved during the move rather than on lift. At speed a snake
+          // travels most of a cell in the time a swipe takes to finish, and a
+          // turn that arrives then has already missed the corner.
+          {...swipeHandlers(turn)}
         >
           <canvas ref={canvasRef} className="block h-full w-full touch-none" />
           {hud && (

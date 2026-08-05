@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState, type ComponentType } from 'react';
 import { audio } from './platform/audio';
 import { findGame } from './platform/registry';
+import { writeSave } from './platform/save';
 import type { GameProps } from './platform/game';
-import { Hub } from './shell/Hub';
+import { HUB_SAVE_ID, Hub } from './shell/Hub';
 
 /**
  * Routes between the hub and one loaded game.
@@ -49,6 +50,9 @@ export default function App() {
   const select = useCallback((id: string) => {
     audio.unlock();
     audio.ui();
+    // Recorded by the shell, not by the game, because it is the hub's fact
+    // rather than the game's: which tile leads the page next time.
+    writeSave(HUB_SAVE_ID, { last: id });
     setGame(null);
     setLoadFailed(false);
     setSelected(id);
@@ -65,22 +69,45 @@ export default function App() {
 
   if (failed) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-950 px-6 text-center text-slate-300">
-        <p>That game failed to load.</p>
-        <button
-          onClick={exit}
-          className="rounded-lg border border-slate-700 px-4 py-2 transition hover:border-slate-500"
-        >
-          Back to all games
-        </button>
+      <main className="game-shell">
+        <div className="flex flex-col items-center gap-4 px-6 text-center text-slate-300">
+          <p>That game failed to load.</p>
+          <button
+            onClick={exit}
+            className="rounded-lg border border-slate-700 px-4 py-2.5 transition hover:border-slate-500"
+          >
+            Back to all games
+          </button>
+        </div>
       </main>
     );
   }
 
   if (!Game) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-500">
-        Loading...
+      // Accented rather than the bare word it used to be. The shell already
+      // holds the game's colour in the registry, so the stall can belong to the
+      // game you tapped instead of being a generic gap in front of it.
+      <main className="game-shell">
+        <div className="flex flex-col items-center gap-5 text-center">
+          <span
+            className="text-3xl font-black tracking-tight"
+            style={{ color: entry?.accentText ?? '#94a3b8' }}
+          >
+            {entry?.title ?? 'Loading'}
+          </span>
+          <span
+            className="relative block h-1 w-50 overflow-hidden rounded-full bg-slate-800"
+            aria-label="Loading"
+            role="status"
+          >
+            <span
+              className="loading-sweep absolute inset-y-0 left-0 w-[30%] rounded-full"
+              style={{ background: entry?.accent ?? '#64748b' }}
+              aria-hidden
+            />
+          </span>
+        </div>
       </main>
     );
   }

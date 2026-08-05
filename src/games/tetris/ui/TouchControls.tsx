@@ -34,7 +34,7 @@ export function TouchControls({ onAct, onHold }: Props) {
   });
 
   return (
-    <div className="mt-4 grid grid-cols-6 gap-2 sm:hidden">
+    <div className="mt-4 grid grid-cols-6 gap-2 [@media(hover:hover)]:hidden">
       <Pad label="Move left" {...holdProps('left')}>
         <ChevronLeft size={20} />
       </Pad>

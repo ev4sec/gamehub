@@ -81,6 +81,53 @@ export const games: GameEntry[] = [
     accentText: '#c4b5fd',
     load: () => import('../games/sokoban').then((m) => m.default),
   },
+  {
+    // Rose rather than the orange the batteries wear on the field. On the
+    // field orange means "this is yours to fire"; the tile needs the colour of
+    // the thing coming down, which is what the game is actually about.
+    id: 'missile',
+    title: 'Missile Command',
+    blurb: 'Six cities, one sky. Tap where it will be.',
+    accent: '#fb7185',
+    accentText: '#fda4af',
+    load: () => import('../games/missile').then((m) => m.default),
+  },
+  {
+    // Yellow-green, which is a long way from Snake's emerald in both hue and
+    // lightness. Two green games on one page is only a problem if they are the
+    // same green.
+    id: 'frogger',
+    title: 'Frogger',
+    blurb: 'Dodge the traffic, ride the logs home.',
+    accent: '#a3e635',
+    accentText: '#bef264',
+    load: () => import('../games/frogger').then((m) => m.default),
+  },
+  {
+    // Vector-phosphor magenta. It sits nearer Sokoban's violet than any other
+    // pair on the page, which is survivable for three reasons: fuchsia-400 is
+    // far more saturated than that lavender, this game's field is white line
+    // art so the hue appears only on what the player emits, and registry order
+    // keeps the two tiles off the same row.
+    id: 'asteroids',
+    title: 'Asteroids',
+    blurb: 'Thrust, turn, wrap. Every rock splits.',
+    accent: '#e879f9',
+    accentText: '#f0abfc',
+    load: () => import('../games/asteroids').then((m) => m.default),
+  },
+  {
+    // The genre's hero is yellow and 2048 already has it, so this steps one
+    // notch to orange. Eighteen degrees understates the separation: the yellow
+    // region of the wheel is perceptually compressed, and amber-400 reads as
+    // gold where orange-400 reads as orange.
+    id: 'mazechase',
+    title: 'Maze Chase',
+    blurb: 'Clear the dots. Four ghosts, four minds.',
+    accent: '#fb923c',
+    accentText: '#fdba74',
+    load: () => import('../games/mazechase').then((m) => m.default),
+  },
 ];
 
 export function findGame(id: string): GameEntry | undefined {

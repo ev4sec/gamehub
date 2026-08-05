@@ -25,7 +25,29 @@ export default function BreakoutGame({ onExit }: GameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const game = useBreakoutGame(canvasRef);
 
-  const { mode, hud, launch, hold, pointAt, togglePause, restart, quit, nextLevel } = game;
+  const {
+    mode,
+    hud,
+    launch,
+    hold,
+    pointAt,
+    paddleX,
+    worldXOf,
+    pointAtWorld,
+    togglePause,
+    restart,
+    quit,
+    nextLevel,
+  } = game;
+
+  /**
+   * A touch drag steers relative to where it started, at a little over 1:1, so
+   * the paddle never jumps to the finger and the thumb can rest low and off to
+   * one side instead of covering the field. A mouse keeps steering absolutely,
+   * which is what a mouse is for.
+   */
+  const drag = useRef<{ clientX: number; worldX: number } | null>(null);
+  const DRAG_GAIN = 1.6;
 
   useEffect(() => {
     if (!mode) return;
@@ -76,7 +98,7 @@ export default function BreakoutGame({ onExit }: GameProps) {
   // once we are past this branch.
   if (!mode) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-100">
+      <main className="game-shell">
         <Menu
           save={game.save}
           onStart={game.start}
@@ -88,7 +110,7 @@ export default function BreakoutGame({ onExit }: GameProps) {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-6 text-slate-100">
+    <main className="game-shell">
       <div className="w-full max-w-3xl">
         {hud && (
           <Hud
@@ -108,11 +130,35 @@ export default function BreakoutGame({ onExit }: GameProps) {
           data-bricks={hud?.bricksLeft ?? -1}
           data-lives={hud?.lives ?? -1}
           data-level={hud?.level ?? -1}
-          onPointerMove={(e) => pointAt(e.clientX)}
-          onPointerLeave={() => pointAt(null)}
+          onPointerMove={(e) => {
+            const held = drag.current;
+            if (!held) {
+              pointAt(e.clientX);
+              return;
+            }
+            const from = worldXOf(held.clientX);
+            const to = worldXOf(e.clientX);
+            if (from === null || to === null) return;
+            pointAtWorld(held.worldX + (to - from) * DRAG_GAIN);
+          }}
+          onPointerLeave={() => {
+            drag.current = null;
+            pointAt(null);
+          }}
           onPointerDown={(e) => {
-            pointAt(e.clientX);
+            if (e.pointerType === 'mouse') {
+              pointAt(e.clientX);
+            } else {
+              const at = paddleX();
+              drag.current = at === null ? null : { clientX: e.clientX, worldX: at };
+            }
             launch();
+          }}
+          onPointerUp={() => {
+            drag.current = null;
+          }}
+          onPointerCancel={() => {
+            drag.current = null;
           }}
         >
           <canvas ref={canvasRef} className="block h-full w-full touch-none" />

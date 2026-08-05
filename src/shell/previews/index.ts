@@ -1,5 +1,9 @@
+import { asteroidsPreview } from './asteroids';
 import { breakoutPreview } from './breakout';
+import { froggerPreview } from './frogger';
 import { game2048Preview } from './g2048';
+import { mazechasePreview } from './mazechase';
+import { missilePreview } from './missile';
 import { snakePreview } from './snake';
 import { sokobanPreview } from './sokoban';
 import { tetrisPreview } from './tetris';
@@ -22,6 +26,10 @@ export const previews: Record<string, PreviewSpec> = {
   '2048': game2048Preview,
   breakout: breakoutPreview,
   sokoban: sokobanPreview,
+  missile: missilePreview,
+  frogger: froggerPreview,
+  asteroids: asteroidsPreview,
+  mazechase: mazechasePreview,
 };
 
 export type { PreviewSpec };

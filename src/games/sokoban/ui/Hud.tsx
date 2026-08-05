@@ -15,8 +15,8 @@ export function Hud({ hud, save, onUndo, onReset, onQuit }: Props) {
 
   return (
     <div className="w-full">
-      <div className="flex items-end justify-between gap-4">
-        <div className="flex items-end gap-5">
+      <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <div className="flex items-end gap-3 sm:gap-5">
           <Stat label="Moves" value={String(hud.moves)} tone="text-slate-100" />
           <Stat label="Pushes" value={String(hud.pushes)} tone="text-slate-300" />
           <Stat
@@ -39,21 +39,21 @@ export function Hud({ hud, save, onUndo, onReset, onQuit }: Props) {
             onClick={onUndo}
             disabled={!hud.canUndo}
             aria-label="Undo the last move"
-            className="rounded-lg border border-slate-700 p-2 text-slate-300 transition enabled:hover:border-slate-500 enabled:hover:text-white disabled:opacity-30"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition enabled:hover:border-slate-500 enabled:hover:text-white disabled:opacity-30"
           >
             <Undo2 size={16} />
           </button>
           <button
             onClick={onReset}
             aria-label="Restart the level"
-            className="rounded-lg border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition hover:border-slate-500 hover:text-white"
           >
             <RotateCcw size={16} />
           </button>
           <button
             onClick={onQuit}
             aria-label="Back to menu"
-            className="rounded-lg border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition hover:border-slate-500 hover:text-white"
           >
             <Home size={16} />
           </button>
