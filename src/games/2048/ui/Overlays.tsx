@@ -57,7 +57,10 @@ export function Overlays({ hud, isBest, onRestart, onQuit, onKeepPlaying }: Prop
 
 function Sheet({ children }: { children: React.ReactNode }) {
   return (
-    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-slate-950/85 px-6 text-center backdrop-blur-sm">
+    <div
+      data-overlay
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-slate-950/85 px-6 text-center backdrop-blur-sm"
+    >
       {children}
     </div>
   );

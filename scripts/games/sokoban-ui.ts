@@ -70,15 +70,40 @@ export async function sokobanDeepChecks(): Promise<void> {
   check(count('[data-box="home"]') === 0, 'the box came off its goal');
   check(!text().includes('Solved'), 'the solved sheet is gone');
 
-  section('sokoban: on to the next level');
+  section('sokoban: the arrows move the selection on the solved sheet');
   await walk('ArrowRight');
   check(status() === 'solved', 're-solved the level');
-
-  // The sheet's button and the keyboard are two separate paths to the same
-  // call, and only one of them was ever driven here. The button worked; Enter
-  // did nothing, because the handler only listened for N. Drive the keyboard,
-  // and check the button is still there to be pressed.
   check(buttonWith('Next level') !== null, 'the solved sheet offers a way on');
+
+  // The reported bug, driven exactly as it was hit: solve, then reach for the
+  // arrows to pick a different action. They used to fall straight through to
+  // the board's own handler and the selection never moved off the primary.
+  press('ArrowRight');
+  await settle();
+  check(
+    (document.activeElement?.textContent ?? '').includes('Again'),
+    `right moved the selection to '${document.activeElement?.textContent}'`,
+  );
+
+  press('ArrowLeft');
+  await settle();
+  check(
+    (document.activeElement?.textContent ?? '').includes('Next level'),
+    'left moved it back to the primary action',
+  );
+
+  section('sokoban: Enter takes the selected action, not always the first');
+  press('ArrowRight');
+  await settle();
+  press('Enter');
+  await settle();
+  check(attr('data-level') === 0, 'choosing Again replayed the level rather than advancing');
+  check(status() === 'playing', 'and the board is playable again');
+  check(attr('data-moves') === 0, 'from a clean counter');
+
+  section('sokoban: on to the next level');
+  await walk('ArrowRight');
+  check(status() === 'solved', 'solved it once more');
   press('Enter');
   await settle();
   check(attr('data-level') === 1, `Enter moved to level index ${attr('data-level')}`);

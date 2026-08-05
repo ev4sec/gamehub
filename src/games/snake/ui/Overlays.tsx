@@ -31,7 +31,10 @@ export function Overlays({
   if (hud.status === 'playing') return null;
 
   return (
-    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-slate-950/80 backdrop-blur-sm">
+    <div
+      data-overlay
+      className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-slate-950/80 backdrop-blur-sm"
+    >
       {hud.status === 'paused' && (
         <Panel title="Paused" accent="text-slate-100">
           <p className="text-sm text-slate-400">Press Space to resume.</p>

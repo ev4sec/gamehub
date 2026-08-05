@@ -66,6 +66,19 @@
     margin-block: auto;
   }
 
+  /*
+   * The selected action on an overlay.
+   *
+   * Styled on `:focus` rather than only `:focus-visible`, because the focus is
+   * moved programmatically by the arrow-key handler and whether a browser
+   * counts that as "visible" is a heuristic. The one thing that must not happen
+   * is a player pressing right and seeing nothing move.
+   */
+  [data-overlay] button:focus {
+    outline: 2px solid #f8fafc;
+    outline-offset: 3px;
+  }
+
   /* The sweep on the loading bar between the hub and a game. */
   .loading-sweep {
     animation: gamehub-sweep 1.2s ease-in-out infinite;

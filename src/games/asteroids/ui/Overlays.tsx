@@ -95,6 +95,7 @@ function Sheet({
         e.stopPropagation();
         onDismiss?.();
       }}
+      data-overlay
       className={`absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center ${
         dim ? 'bg-slate-950/85 backdrop-blur-sm' : 'bg-slate-950/45'
       }`}

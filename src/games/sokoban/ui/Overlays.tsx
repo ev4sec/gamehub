@@ -15,7 +15,10 @@ export function Overlays({ hud, isBest, onNext, onReset, onQuit }: Props) {
   const last = hud.levelIndex >= levelCount() - 1;
 
   return (
-    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-slate-950/88 px-6 text-center backdrop-blur-sm">
+    <div
+      data-overlay
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-slate-950/88 px-6 text-center backdrop-blur-sm"
+    >
       <h2 className="text-3xl font-black tracking-tight text-emerald-300">Solved</h2>
       <p className="mt-2 text-sm text-slate-400">{hud.name}</p>
 

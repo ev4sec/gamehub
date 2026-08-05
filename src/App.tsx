@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ComponentType } from 'react';
 import { audio } from './platform/audio';
 import { findGame } from './platform/registry';
+import { useOverlayNav } from './platform/overlayNav';
 import { writeSave } from './platform/save';
 import type { GameProps } from './platform/game';
 import { HUB_SAVE_ID, Hub } from './shell/Hub';
@@ -15,6 +16,10 @@ import { HUB_SAVE_ID, Hub } from './shell/Hub';
  * precisely because nothing ever executed the gate.
  */
 export default function App() {
+  // Mounted once, for every game. Overlays are found by attribute rather than
+  // by reference, because the shell must not import a game to reach one.
+  useOverlayNav();
+
   const [selected, setSelected] = useState<string | null>(null);
   const [Game, setGame] = useState<ComponentType<GameProps> | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
