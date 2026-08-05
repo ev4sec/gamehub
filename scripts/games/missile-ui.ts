@@ -44,9 +44,12 @@ export async function missileDeepChecks(): Promise<void> {
   check(armed === 30, 'three batteries hold ten missiles each');
 
   section('missile: the banner gives way');
-  click(buttonWith('Begin'));
+  // Enter rather than a click. The button was always wired; the keyboard was
+  // not, which is exactly how Sokoban shipped unable to advance a level.
+  check(buttonWith('Begin') !== null, 'the banner offers a way on');
+  press('Enter');
   await settle();
-  check(attr('data-status') === 'playing', 'Begin starts the wave immediately');
+  check(attr('data-status') === 'playing', 'Enter starts the wave');
 
   section('missile: firing costs a missile');
   pointerDown(field()!, 0, 0);

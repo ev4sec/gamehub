@@ -44,9 +44,12 @@ export async function froggerDeepChecks(): Promise<void> {
   check(start === 13, 'the frog starts on the near bank');
 
   section('frogger: the banner gives way');
-  click(buttonWith('Hop to it'));
+  // Enter rather than a click. The button was always wired; the keyboard was
+  // not, which is exactly how Sokoban shipped unable to advance a level.
+  check(buttonWith('Hop to it') !== null, 'the banner offers a way on');
+  press('Enter');
   await settle();
-  check(attr('data-status') === 'playing', 'the primary action starts the crossing');
+  check(attr('data-status') === 'playing', 'Enter starts the crossing');
 
   section('frogger: hopping');
   // Backwards first, from the bottom row, so the bounds check runs before any

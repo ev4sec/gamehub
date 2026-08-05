@@ -44,9 +44,12 @@ export async function mazechaseDeepChecks(): Promise<void> {
   check(dots > 200, 'the maze starts full of dots');
 
   section('mazechase: the banner gives way');
-  click(buttonWith('Go'));
+  // Enter rather than a click. The button was always wired; the keyboard was
+  // not, which is exactly how Sokoban shipped unable to advance a level.
+  check(buttonWith('Go') !== null, 'the banner offers a way on');
+  press('Enter');
   await settle();
-  check(attr('data-status') === 'playing', 'the primary action starts the level');
+  check(attr('data-status') === 'playing', 'Enter starts the level');
 
   section('mazechase: eating');
   tap('ArrowLeft');

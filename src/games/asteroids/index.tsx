@@ -63,6 +63,13 @@ export default function AsteroidsGame({ onExit }: GameProps) {
           e.preventDefault();
           togglePause();
           return;
+        case 'Enter':
+          e.preventDefault();
+          // Launch, or Again, or Resume: whichever the sheet is offering.
+          if (hud?.status === 'over') restart();
+          else if (hud?.status === 'paused') togglePause();
+          else skip();
+          return;
         case 'Escape':
           quit();
           return;
@@ -104,7 +111,7 @@ export default function AsteroidsGame({ onExit }: GameProps) {
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [mode, setTurn, setThrust, setFiring, hyperspace, togglePause, quit]);
+  }, [mode, hud?.status, setTurn, setThrust, setFiring, hyperspace, skip, restart, togglePause, quit]);
 
   if (!mode) {
     return (

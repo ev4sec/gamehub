@@ -19,12 +19,20 @@ export default function MissileGame({ onExit }: GameProps) {
         togglePause();
         return;
       }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        // Begin, Next wave, or Again: whichever the sheet is offering.
+        if (hud?.status === 'over') restart();
+        else if (hud?.status === 'paused') togglePause();
+        else skip();
+        return;
+      }
       if (e.key === 'Escape') quit();
     };
 
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [mode, togglePause, quit]);
+  }, [mode, hud?.status, skip, restart, togglePause, quit]);
 
   if (!mode) {
     return (

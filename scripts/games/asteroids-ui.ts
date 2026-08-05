@@ -41,9 +41,12 @@ export async function asteroidsDeepChecks(): Promise<void> {
   check(num('data-rocks') === 4, 'and four large rocks');
 
   section('asteroids: the banner gives way');
-  click(buttonWith('Launch'));
+  // Enter rather than a click. The button was always wired; the keyboard was
+  // not, which is exactly how Sokoban shipped unable to advance a level.
+  check(buttonWith('Launch') !== null, 'the banner offers a way on');
+  press('Enter');
   await settle();
-  check(attr('data-status') === 'playing', 'Launch starts the wave');
+  check(attr('data-status') === 'playing', 'Enter starts the wave');
   check(num('data-bullets') === 0, 'nothing has been fired yet');
 
   section('asteroids: firing');

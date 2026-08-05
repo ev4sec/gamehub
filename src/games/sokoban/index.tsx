@@ -48,7 +48,10 @@ export default function SokobanGame({ onExit }: GameProps) {
         restart();
         return;
       }
-      if (e.key === 'n' || e.key === 'N') {
+      // Enter as well as N. Enter is what every other game in the hub uses to
+      // take the overlay's primary action, and a player who has just solved a
+      // level reaches for it before reading the hint that says otherwise.
+      if (e.key === 'n' || e.key === 'N' || e.key === 'Enter') {
         e.preventDefault();
         if (hud?.status === 'solved') nextLevel();
         return;

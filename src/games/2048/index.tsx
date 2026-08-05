@@ -26,7 +26,7 @@ const KEY_DIRS: Record<string, Dir> = {
 export default function Game2048({ onExit }: GameProps) {
   const game = use2048Game();
 
-  const { mode, hud, play, undo, restart, quit } = game;
+  const { mode, hud, play, undo, restart, keepPlaying, quit } = game;
 
   useEffect(() => {
     if (!mode) return;
@@ -48,12 +48,19 @@ export default function Game2048({ onExit }: GameProps) {
         restart();
         return;
       }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        // Whatever the overlay's primary button is, Enter presses it.
+        if (hud?.status === 'won') keepPlaying();
+        else if (hud?.status === 'over') restart();
+        return;
+      }
       if (e.key === 'Escape') quit();
     };
 
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [mode, play, undo, restart, quit]);
+  }, [mode, hud?.status, play, undo, restart, keepPlaying, quit]);
 
   // Gating the board on `hud` is safe here, unlike in the ticked games. There,
   // the first HUD came from an effect that needed the canvas, so waiting on

@@ -43,12 +43,19 @@ export default function FroggerGame({ onExit }: GameProps) {
         togglePause();
         return;
       }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (hud?.status === 'over') restart();
+        else if (hud?.status === 'paused') togglePause();
+        else skip();
+        return;
+      }
       if (e.key === 'Escape') quit();
     };
 
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [mode, hop, togglePause, quit]);
+  }, [mode, hud?.status, hop, skip, restart, togglePause, quit]);
 
   if (!mode) {
     return (

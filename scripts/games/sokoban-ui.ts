@@ -73,9 +73,15 @@ export async function sokobanDeepChecks(): Promise<void> {
   section('sokoban: on to the next level');
   await walk('ArrowRight');
   check(status() === 'solved', 're-solved the level');
-  click(buttonWith('Next level'));
+
+  // The sheet's button and the keyboard are two separate paths to the same
+  // call, and only one of them was ever driven here. The button worked; Enter
+  // did nothing, because the handler only listened for N. Drive the keyboard,
+  // and check the button is still there to be pressed.
+  check(buttonWith('Next level') !== null, 'the solved sheet offers a way on');
+  press('Enter');
   await settle();
-  check(attr('data-level') === 1, `moved to level index ${attr('data-level')}`);
+  check(attr('data-level') === 1, `Enter moved to level index ${attr('data-level')}`);
   check(status() === 'playing', 'the next level is playable');
   check(attr('data-moves') === 0, 'the next level starts with a clean counter');
   check(text().includes('Round the back'), 'the next level is named');

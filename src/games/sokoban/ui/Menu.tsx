@@ -65,7 +65,8 @@ export function Menu({ save, onStart, onToggleSound, onExit }: Props) {
       <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900/40 p-4 text-xs leading-relaxed text-slate-500">
         <span className="font-semibold text-slate-400">Controls.</span> Arrows or WASD
         walk and push. U takes back a move, and the history goes all the way to the
-        start. R restarts the level, N moves on once it is solved, Escape leaves.
+        start. R restarts the level, Enter or N moves on once it is solved, Escape
+        leaves.
       </div>
 
       <button
