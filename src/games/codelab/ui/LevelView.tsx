@@ -261,7 +261,9 @@ export function LevelView({
         </button>
       )}
 
-      <Inspector initial={level.inspect} inspect={inspect} />
+      {/* Only where there is something to look up. On a level with no imports
+          the panel is a question with no subject. */}
+      {level.inspect && <Inspector initial={level.inspect} inspect={inspect} />}
 
       <p className="mt-4 text-xs text-slate-600">Ctrl+Enter checks your answer.</p>
     </div>

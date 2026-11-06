@@ -40,6 +40,7 @@ export async function codelabDeepChecks(): Promise<void> {
   section('Code Lab: a predict level');
   open('basics-1');
   await settle();
+  check(!text().includes('Inspector'), 'no inspector on a level with no imports');
   check(text().includes('Top to bottom'), 'level opens');
   check(document.querySelector('[data-level-title]') !== null, 'level title is marked');
 
