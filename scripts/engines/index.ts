@@ -7,6 +7,7 @@ import { missileEngineChecks } from './missile';
 import { froggerEngineChecks } from './frogger';
 import { asteroidsEngineChecks } from './asteroids';
 import { mazechaseEngineChecks } from './mazechase';
+import { codelabEngineChecks } from './codelab';
 
 /**
  * Per-game engine checks, keyed by registry id.
@@ -26,4 +27,5 @@ export const engineChecks: Record<string, () => void> = {
   frogger: froggerEngineChecks,
   asteroids: asteroidsEngineChecks,
   mazechase: mazechaseEngineChecks,
+  codelab: codelabEngineChecks,
 };

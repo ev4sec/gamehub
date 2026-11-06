@@ -30,6 +30,11 @@ export interface GameEntry {
   /** A lighter step of the same hue, for text that must clear contrast. */
   accentText: string;
   /**
+   * Marks a game that is playable but not finished. The hub tile wears an "In
+   * development" chip, so a visitor knows what they are opening.
+   */
+  status?: 'in-development';
+  /**
    * Loads the game on selection rather than at startup, so one game's code does
    * not sit inside every other game's bundle.
    */
@@ -127,6 +132,19 @@ export const games: GameEntry[] = [
     accent: '#fb923c',
     accentText: '#fdba74',
     load: () => import('../games/mazechase').then((m) => m.default),
+  },
+  {
+    // Indigo is the one hue on the page nobody has claimed. It sits between
+    // Sokoban's violet and Breakout's sky blue, close to both, which is
+    // acceptable here because this tile is the only one that is not an arcade
+    // game and its artwork is text rather than shapes.
+    id: 'codelab',
+    title: 'Code Lab',
+    blurb: 'Read real Python. Run it. Trace imports.',
+    accent: '#818cf8',
+    accentText: '#a5b4fc',
+    status: 'in-development',
+    load: () => import('../games/codelab').then((m) => m.default),
   },
 ];
 

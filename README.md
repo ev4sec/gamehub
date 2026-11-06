@@ -6,7 +6,7 @@ layer and one test harness. No install, no accounts, no server.
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm run check    # typecheck + lint + both smoke suites
+npm run check    # typecheck + lint + both smoke suites + level verification
 npm run build    # static bundle in dist/
 ```
 
@@ -44,6 +44,7 @@ different things and are told apart by silhouette as well as by colour.
 | **Frogger** | A discrete board whose occupants are one float per lane |
 | **Asteroids** | Free float physics on a wrapped surface, no edges at all |
 | **Maze Chase** | Tile-and-fraction actors, four independent pursuers |
+| **Code Lab** | Not an arcade game. Real Python in a worker: predict output, finish functions, trace where an import comes from |
 
 The spread is chosen so the games feel different to play, and so the shared
 platform is proven against a continuous game, a grid game and a game with no

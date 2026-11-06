@@ -9,3 +9,4 @@ scripts/.*.cjs
 .idea
 .vscode/*
 !.vscode/extensions.json
+public/pyodide

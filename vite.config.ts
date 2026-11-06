@@ -11,6 +11,11 @@ export default defineConfig(({ command }) => ({
   base: command === 'build' ? '/gamehub/' : '/',
   plugins: [react()],
   optimizeDeps: {
-    exclude: ['lucide-react'],
+    // pyodide locates its own runtime files relative to its module, which the
+    // dependency pre-bundler would break.
+    exclude: ['lucide-react', 'pyodide'],
+  },
+  worker: {
+    format: 'es',
   },
 }));

@@ -74,6 +74,11 @@ async function main() {
   for (const game of games) {
     check(text().includes(game.title), `${game.title} has a card`);
   }
+  check(
+    document.querySelectorAll('[data-status="in-development"]').length ===
+      games.filter((g) => g.status === 'in-development').length,
+    'every in-development game wears the chip, and nothing else does',
+  );
   // The hub used to forbid canvases outright. It now allows exactly one per
   // registered game, for the preview art, and forbids anything else. That is
   // strictly stronger: a stray canvas still fails, and a missing preview now

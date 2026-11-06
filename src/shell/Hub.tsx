@@ -189,6 +189,17 @@ function Tile({
           </span>
         )}
 
+        {game.status === 'in-development' && (
+          // Outlined rather than filled, so it reads as a state and not as the
+          // tile's identity chip on the opposite corner.
+          <span
+            data-status="in-development"
+            className="absolute right-3 top-3 z-10 rounded-full border border-amber-300/60 bg-slate-950/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-amber-200"
+          >
+            In development
+          </span>
+        )}
+
         <div
           className="absolute inset-0"
           style={{
