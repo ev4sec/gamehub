@@ -10,23 +10,29 @@ import { engineChecks } from './engines';
 import { failureCount, section } from './checks';
 import { games } from '../src/platform/registry';
 
-let untested = 0;
+async function main(): Promise<void> {
+  let untested = 0;
 
-for (const game of games) {
-  const checks = engineChecks[game.id];
-  section(`${game.title} engine`);
-  if (!checks) {
-    untested += 1;
-    console.log(`  note  no engine checks registered for ${game.id}`);
-    continue;
+  for (const game of games) {
+    const checks = engineChecks[game.id];
+    section(`${game.title} engine`);
+    if (!checks) {
+      untested += 1;
+      console.log(`  note  no engine checks registered for ${game.id}`);
+      continue;
+    }
+    // Awaited so a suite with an async grader in it is finished before the
+    // tally is read. A sync suite returns undefined and this costs nothing.
+    await checks();
   }
-  checks();
+
+  if (untested > 0) {
+    console.log(`\n${untested} registered game(s) have no engine checks.`);
+  }
+
+  const failures = failureCount();
+  console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
+  process.exit(failures === 0 ? 0 : 1);
 }
 
-if (untested > 0) {
-  console.log(`\n${untested} registered game(s) have no engine checks.`);
-}
-
-const failures = failureCount();
-console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`);
-process.exit(failures === 0 ? 0 : 1);
+void main();

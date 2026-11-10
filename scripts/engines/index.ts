@@ -17,7 +17,7 @@ import { codelabEngineChecks } from './codelab';
  * skipped. Same principle as the UI suite: registering a game is what puts it
  * under test, and a gap has to announce itself.
  */
-export const engineChecks: Record<string, () => void> = {
+export const engineChecks: Record<string, () => void | Promise<void>> = {
   snake: snakeEngineChecks,
   tetris: tetrisEngineChecks,
   '2048': twentyFortyEightEngineChecks,

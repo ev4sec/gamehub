@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 import { loadPyodide, type PyodideInterface } from 'pyodide';
+import { MAX_TRACE_STEPS, TRACE_SOURCE, parseTrace, readPyError } from './tracer';
 import type { InspectResult, RunResult } from './types';
 
 /**
@@ -10,6 +11,7 @@ import type { InspectResult, RunResult } from './types';
 
 type Request = { id: number; baseUrl: string } & (
   | { kind: 'run'; code: string }
+  | { kind: 'trace'; code: string }
   | { kind: 'inspect'; name: string }
 );
 
@@ -59,6 +61,7 @@ self.onmessage = async (event: MessageEvent<Request>) => {
   if (msg.kind === 'run') {
     let out = '';
     let error = '';
+    let errorLine = 0;
     py.setStdout({ batched: (s: string) => (out += `${s}\n`) });
     py.setStderr({ batched: (s: string) => (out += `${s}\n`) });
     try {
@@ -66,12 +69,17 @@ self.onmessage = async (event: MessageEvent<Request>) => {
       await py.runPythonAsync(msg.code, { globals });
       globals.destroy();
     } catch (e) {
-      // The last line of a Python traceback is the human-readable part.
-      const lines = String((e as Error).message).trim().split('\n');
-      error = lines[lines.length - 1] ?? 'Error';
+      ({ error, errorLine } = readPyError(String((e as Error).message)));
     }
-    const result: RunResult = { stdout: out, error, timedOut: false };
+    const result: RunResult = { stdout: out, error, errorLine, timedOut: false };
     self.postMessage({ id: msg.id, result });
+    return;
+  }
+
+  if (msg.kind === 'trace') {
+    await py.runPythonAsync(TRACE_SOURCE);
+    const fn = py.globals.get('_lab_trace') as (src: string, max: number) => string;
+    self.postMessage({ id: msg.id, result: parseTrace(fn(msg.code, MAX_TRACE_STEPS)) });
     return;
   }
 

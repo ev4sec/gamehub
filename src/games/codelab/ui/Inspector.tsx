@@ -71,22 +71,22 @@ export function Inspector({ initial = '', inspect }: Props) {
       {result && (
         <dl data-inspect-result className="mt-3 space-y-2 text-xs leading-relaxed">
           <div>
-            <dt className="uppercase tracking-widest text-slate-500">Home</dt>
+            <dt className="uppercase tracking-widest text-slate-400">Home</dt>
             <dd className="text-indigo-300">{HOME_LABEL[result.home]}</dd>
           </div>
           <div>
-            <dt className="uppercase tracking-widest text-slate-500">Origin</dt>
+            <dt className="uppercase tracking-widest text-slate-400">Origin</dt>
             <dd className="break-all font-mono text-slate-200">{result.origin || 'n/a'}</dd>
           </div>
           {result.doc && (
             <div>
-              <dt className="uppercase tracking-widest text-slate-500">Docstring</dt>
+              <dt className="uppercase tracking-widest text-slate-400">Docstring</dt>
               <dd className="text-slate-300">{result.doc}</dd>
             </div>
           )}
           {result.names.length > 0 && (
             <div>
-              <dt className="uppercase tracking-widest text-slate-500">Public names (dir)</dt>
+              <dt className="uppercase tracking-widest text-slate-400">Public names (dir)</dt>
               <dd className="font-mono text-slate-400">{result.names.join('  ')}</dd>
             </div>
           )}

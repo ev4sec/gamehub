@@ -44,7 +44,7 @@ different things and are told apart by silhouette as well as by colour.
 | **Frogger** | A discrete board whose occupants are one float per lane |
 | **Asteroids** | Free float physics on a wrapped surface, no edges at all |
 | **Maze Chase** | Tile-and-fraction actors, four independent pursuers |
-| **Code Lab** | Not an arcade game. Real Python in a worker: predict output, finish functions, trace where an import comes from |
+| **Code Lab** | Not an arcade game. A reading course in two tracks, Python and TypeScript: predict output, name what a function does, spot the bug, and read a React component. Every snippet really runs (Python in a worker, with a line-by-line stepper), and solved levels come back on a review schedule. After editing a TypeScript predict level, run `npm run gen:ts` |
 
 The spread is chosen so the games feel different to play, and so the shared
 platform is proven against a continuous game, a grid game and a game with no

@@ -1,4 +1,4 @@
-import type { InspectResult, PyRunner, RunResult } from './types';
+import type { InspectResult, PyRunner, RunResult, TraceResult } from './types';
 
 const BOOT_ALLOWANCE_MS = 20000;
 
@@ -6,7 +6,7 @@ const BOOT_ALLOWANCE_MS = 20000;
  * Owns the worker. Created lazily so that opening the game costs nothing until
  * the player actually runs code, and recreated after a timeout kills it.
  */
-export function createPyRunner(baseUrl: string): PyRunner {
+function createWorkerRunner(baseUrl: string): PyRunner {
   let worker: Worker | null = null;
   let booted = false;
   let nextId = 1;
@@ -47,7 +47,14 @@ export function createPyRunner(baseUrl: string): PyRunner {
   return {
     async run(code, timeoutMs = 4000): Promise<RunResult> {
       const r = await call<RunResult>({ kind: 'run', code }, timeoutMs);
-      if (r === 'timeout') return { stdout: '', error: '', timedOut: true };
+      if (r === 'timeout') return { stdout: '', error: '', errorLine: 0, timedOut: true };
+      return r;
+    },
+    async trace(code): Promise<TraceResult> {
+      const r = await call<TraceResult>({ kind: 'trace', code }, 6000);
+      if (r === 'timeout') {
+        return { steps: [], stdout: '', error: '', errorLine: 0, truncated: false, timedOut: true };
+      }
       return r;
     },
     async inspect(name): Promise<InspectResult> {
@@ -70,4 +77,19 @@ export function createPyRunner(baseUrl: string): PyRunner {
       worker = null;
     },
   };
+}
+
+let factory: (baseUrl: string) => PyRunner = createWorkerRunner;
+
+export function createPyRunner(baseUrl: string): PyRunner {
+  return factory(baseUrl);
+}
+
+/**
+ * Swaps the interpreter for a stand-in. The headless UI suite has no Worker
+ * and no WebAssembly to start, and without this seam every screen that sits
+ * behind a run or a trace would ship unexecuted.
+ */
+export function setPyRunnerFactory(next: (baseUrl: string) => PyRunner): void {
+  factory = next;
 }

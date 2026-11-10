@@ -140,7 +140,7 @@ export const games: GameEntry[] = [
     // game and its artwork is text rather than shapes.
     id: 'codelab',
     title: 'Code Lab',
-    blurb: 'Read real Python. Run it. Trace imports.',
+    blurb: 'Learn to read real Python. Step through it.',
     accent: '#818cf8',
     accentText: '#a5b4fc',
     status: 'in-development',
