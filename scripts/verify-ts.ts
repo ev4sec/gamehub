@@ -80,6 +80,11 @@ async function nodeAgrees(js: string): Promise<boolean> {
   return ours.length > 0 && ours.join('\n') === nodes.join('\n');
 }
 
+/** Whether a snippet is at least valid syntax in its language. Used for Code Reader's TypeScript lessons. */
+export function parsesAs(source: string, lang: 'ts' | 'tsx'): boolean {
+  return parses(source, `snippet.${lang}`);
+}
+
 export function tsCompiledIsFresh(): void {
   section('type checker');
   // Controls. A checker that could not find React's types, or was not really

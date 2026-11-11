@@ -1,5 +1,5 @@
 import { readSave, writeSave as writeNamespaced } from '../../platform/save';
-import { MAX_BOX, record, type Card, type Outcome } from './engine/review';
+import { MAX_BOX, record, type Card, type Outcome } from '../../platform/spacedReview';
 import type { Track } from './engine/types';
 
 /** Matches the registry id, so this data lives under `gamehub.codelab.v1`. */

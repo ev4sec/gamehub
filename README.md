@@ -45,6 +45,7 @@ different things and are told apart by silhouette as well as by colour.
 | **Asteroids** | Free float physics on a wrapped surface, no edges at all |
 | **Maze Chase** | Tile-and-fraction actors, four independent pursuers |
 | **Code Lab** | Not an arcade game. A reading course in two tracks, Python and TypeScript: predict output, name what a function does, spot the bug, and read a React component. Every snippet really runs (Python in a worker, with a line-by-line stepper), and solved levels come back on a review schedule. After editing a TypeScript predict level, run `npm run gen:ts` |
+| **Code Reader** | Not an arcade game either. A guided course in reading code, from what a line is to tracing untrusted input through a whole file. Each lesson is one annotated snippet: a tour that names its parts, then questions that make you find and name them yourself. Twelve stages, a field guide of every term met, and the same review schedule as Code Lab |
 
 The spread is chosen so the games feel different to play, and so the shared
 platform is proven against a continuous game, a grid game and a game with no

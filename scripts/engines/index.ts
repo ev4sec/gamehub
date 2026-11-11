@@ -8,6 +8,7 @@ import { froggerEngineChecks } from './frogger';
 import { asteroidsEngineChecks } from './asteroids';
 import { mazechaseEngineChecks } from './mazechase';
 import { codelabEngineChecks } from './codelab';
+import { codereaderEngineChecks } from './codereader';
 
 /**
  * Per-game engine checks, keyed by registry id.
@@ -28,4 +29,5 @@ export const engineChecks: Record<string, () => void | Promise<void>> = {
   asteroids: asteroidsEngineChecks,
   mazechase: mazechaseEngineChecks,
   codelab: codelabEngineChecks,
+  codereader: codereaderEngineChecks,
 };

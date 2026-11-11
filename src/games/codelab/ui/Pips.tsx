@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MAX_BOX } from '../engine/review';
+import { MAX_BOX } from '../../../platform/spacedReview';
 
 interface Props {
   strength: number;

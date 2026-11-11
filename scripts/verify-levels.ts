@@ -19,7 +19,8 @@ import {
 } from '../src/games/codelab/runner/tracer';
 import type { PyRunner, RunResult, TraceResult } from '../src/games/codelab/runner/types';
 import { check, failureCount, section } from './checks';
-import { tsCompiledIsFresh, verifyTsLevel } from './verify-ts';
+import { LESSONS as READER_LESSONS } from '../src/games/codereader/engine/course';
+import { parsesAs, tsCompiledIsFresh, verifyTsLevel } from './verify-ts';
 
 async function nodeRunner(py: PyodideInterface): Promise<PyRunner> {
   await py.runPythonAsync(TRACE_SOURCE);
@@ -219,6 +220,15 @@ async function main(): Promise<void> {
 
     check(level.hints.length >= 1, 'has a hint');
   }
+
+  section('Code Reader snippets');
+  for (const lesson of READER_LESSONS) {
+    if (lesson.lang === 'text') continue;
+    const ok = lesson.lang === 'python' ? await parses(py, lesson.code) : parsesAs(lesson.code, lesson.lang);
+    check(ok, `${lesson.id}: ${lesson.fileName} parses as ${lesson.lang}`);
+  }
+  check(!(await parses(py, 'def broken(:')), 'and the Python parser really rejects broken code');
+  check(!parsesAs('const x = ;', 'ts'), 'as does the TypeScript one');
 
   section('standard library claims');
   const stdlib = await py.runPythonAsync(`

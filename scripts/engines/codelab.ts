@@ -28,7 +28,7 @@ import {
 import { COMPILED } from '../../src/games/codelab/engine/tsCompiled';
 import { formatLog } from '../../src/games/codelab/runner/jsConsole';
 import { createJsRunner } from '../../src/games/codelab/runner/jsRunner';
-import { INTERVALS, MAX_BOX, dueIds, nextDue, record } from '../../src/games/codelab/engine/review';
+import { INTERVALS, MAX_BOX, dueIds, nextDue, record } from '../../src/platform/spacedReview';
 import type { Level } from '../../src/games/codelab/engine/types';
 import type { PyRunner, RunResult } from '../../src/games/codelab/runner/types';
 import { markSolved, type SaveData } from '../../src/games/codelab/save';

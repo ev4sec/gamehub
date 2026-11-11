@@ -2,7 +2,7 @@ import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { EXIT_LABEL } from '../../../platform/game';
 import { CORE, PRACTICE, TRACKS, WORLDS, coreIn, isPractice, levelsIn } from '../engine/levels';
-import { MAX_BOX, dueIds, nextDue, waitText } from '../engine/review';
+import { MAX_BOX, dueIds, nextDue, waitText } from '../../../platform/spacedReview';
 import type { LevelKind, Track } from '../engine/types';
 import type { SaveData } from '../save';
 import { Pips } from './Pips';

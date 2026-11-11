@@ -1,5 +1,6 @@
 import { asteroidsPreview } from './asteroids';
 import { breakoutPreview } from './breakout';
+import { codereaderPreview } from './codereader';
 import { froggerPreview } from './frogger';
 import { game2048Preview } from './g2048';
 import { mazechasePreview } from './mazechase';
@@ -30,6 +31,7 @@ export const previews: Record<string, PreviewSpec> = {
   frogger: froggerPreview,
   asteroids: asteroidsPreview,
   mazechase: mazechasePreview,
+  codereader: codereaderPreview,
 };
 
 export type { PreviewSpec };

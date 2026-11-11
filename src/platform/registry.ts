@@ -146,6 +146,18 @@ export const games: GameEntry[] = [
     status: 'in-development',
     load: () => import('../games/codelab').then((m) => m.default),
   },
+  {
+    // Yellow, the highlighter: marking up code is the game. Nearest is 2048's
+    // amber, held apart by lightness and by sitting three rows away. Not teal
+    // or pink, which would read as this game's own right and wrong.
+    id: 'codereader',
+    title: 'Code Reader',
+    blurb: 'A guided path from imports to whole files.',
+    accent: '#fde047',
+    accentText: '#fef08a',
+    status: 'in-development',
+    load: () => import('../games/codereader').then((m) => m.default),
+  },
 ];
 
 export function findGame(id: string): GameEntry | undefined {

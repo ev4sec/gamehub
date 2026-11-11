@@ -8,6 +8,7 @@ import { froggerDeepChecks } from './frogger-ui';
 import { asteroidsDeepChecks } from './asteroids-ui';
 import { mazechaseDeepChecks } from './mazechase-ui';
 import { codelabDeepChecks } from './codelab-ui';
+import { codereaderDeepChecks } from './codereader-ui';
 
 /**
  * Per-game deep UI checks, keyed by registry id.
@@ -28,4 +29,5 @@ export const deepChecks: Record<string, () => Promise<void>> = {
   asteroids: asteroidsDeepChecks,
   mazechase: mazechaseDeepChecks,
   codelab: codelabDeepChecks,
+  codereader: codereaderDeepChecks,
 };

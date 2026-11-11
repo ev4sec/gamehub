@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { CORE } from '../engine/levels';
-import { nextDue, waitText } from '../engine/review';
+import { nextDue, waitText } from '../../../platform/spacedReview';
 import type { SaveData } from '../save';
 
 interface Props {

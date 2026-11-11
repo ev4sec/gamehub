@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GameProps } from '../../platform/game';
 import { CORE, LEVELS, PRACTICE, coreIn, isPractice, trackOf } from './engine/levels';
-import { dueIds, type Outcome } from './engine/review';
+import { dueIds, type Outcome } from '../../platform/spacedReview';
 import { createJsRunner } from './runner/jsRunner';
 import { createPyRunner } from './runner/pyRunner';
 import type { PyRunner } from './runner/types';

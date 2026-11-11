@@ -24,7 +24,7 @@ import {
   type PredictVerdict,
   type WriteVerdict,
 } from '../engine/grade';
-import { INTERVALS, MAX_BOX, waitText, type Card, type Outcome } from '../engine/review';
+import { INTERVALS, MAX_BOX, waitText, type Card, type Outcome } from '../../../platform/spacedReview';
 import type { Level, LevelKind, Track } from '../engine/types';
 import type { InspectResult, PyRunner, RunResult, TraceResult } from '../runner/types';
 import { CodeBlock } from './CodeBlock';
